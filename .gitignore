@@ -1,0 +1,8 @@
+.deps/
+__pycache__/
+.venv/
+corpus_francois/
+donnees_vatican/
+.notebook-runtime/
+resultats/
+**/.ipynb_checkpoints/
