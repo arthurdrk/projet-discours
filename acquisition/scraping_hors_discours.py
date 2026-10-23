@@ -1,3 +1,4 @@
+import re
 import time
 
 import requests
@@ -34,6 +35,20 @@ def get_trips(url_year):
             for a in h2.find_all("a", href=True):
                 return_list.append(a.get_text(strip=True))
     return return_list
+
+
+def extract_place(title):
+    m = re.search(r"of the Holy Father to (.*?)\s*\([^()]*\d{4}\)\s*$",
+                  title, re.IGNORECASE)
+    if not m:
+        return None
+    texte = re.split(r" and (?:a )?[Vv]isit to ", m.group(1))[0]
+    lieux = []
+    for morceau in re.split(r",\s*|\s+and\s+", texte):
+        morceau = re.sub(r"^the ", "", morceau.strip(), flags=re.IGNORECASE)
+        if morceau:
+            lieux.append(morceau)
+    return lieux
 
 
 def df_preparation(popes=POPES):
