@@ -1,6 +1,7 @@
 import re
 import time
 
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
@@ -12,6 +13,8 @@ POPES = {"John-Paul II": "giovanni-paolo-ii",
          "Francis": "francesco"
          }
 
+Months = ["January", "February", "March", "April", "May", "June", "July", "August"]
+
 
 def get_page_years(id_pope, url_base=URL_Base):
     request_page = requests.get(url_base.format(pope=id_pope)).content
@@ -21,7 +24,7 @@ def get_page_years(id_pope, url_base=URL_Base):
 def get_years(page):
     return_list = []
     for a in page.find_all("a", href=True):
-        if "outside Italy" in a.get_text(strip=True):
+        if "outside Italy" in a.get_text(strip=True) or re.search(r"/travels\.", a.get("href")):
             return_list.append(Domain + a.get("href"))
     return return_list
 
@@ -60,4 +63,5 @@ def df_preparation(popes=POPES):
                 pre_df["Pope"].append(Pope_usual)
                 pre_df["Year"].append(int(year_url.split("/")[-2]))
                 pre_df["Place"].append(trip)
-    return pre_df
+    df = pd.DataFrame(pre_df)
+    return df
