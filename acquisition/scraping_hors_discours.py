@@ -58,7 +58,7 @@ def df_preparation(popes=POPES):
     pre_df = {"Pope": [], "Year": [], "Place": []}
     for Pope_usual, Pope_id in popes.items():
         for year_url in get_years(get_page_years(Pope_id)):
-            time.sleep(1)
+            time.sleep(2)
             for trip in get_trips(year_url):
                 pre_df["Pope"].append(Pope_usual)
                 pre_df["Year"].append(int(year_url.split("/")[-2]))
