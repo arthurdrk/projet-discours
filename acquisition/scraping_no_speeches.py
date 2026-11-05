@@ -13,8 +13,6 @@ POPES = {"John-Paul II": "giovanni-paolo-ii",
          "Francis": "francesco"
          }
 
-Months = ["January", "February", "March", "April", "May", "June", "July", "August"]
-
 
 def get_page_years(id_pope, url_base=URL_Base):
     request_page = requests.get(url_base.format(pope=id_pope)).content
