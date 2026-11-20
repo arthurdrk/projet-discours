@@ -5,6 +5,8 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
+from .cleaning_no_speeches import place_extract
+
 Domain = "https://www.vatican.va"
 URL_Base = "https://www.vatican.va/content/vatican/en/holy-father/{pope}.html"
 
