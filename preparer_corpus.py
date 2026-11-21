@@ -8,8 +8,12 @@ from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
-DATE_FR = re.compile(r'\b\d{1,2}(?:er)?\s+(?:janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre)\s+\d{4}\b', re.I)
-DAY_FR = re.compile(r'^(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b', re.I)
+MONTHS = (r'janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre|'
+          r'january|february|march|april|may|june|july|august|september|october|november|december')
+DATE = re.compile(rf'\b\d{{1,2}}(?:er|st|nd|rd|th)?\s+(?:{MONTHS})\s+\d{{4}}\b|\b(?:{MONTHS})\s+\d{{1,2}},?\s+\d{{4}}\b', re.I)
+DAY = re.compile(r'^(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche|'
+                 r'monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b', re.I)
+JOURNEY = re.compile(r'voyage apostolique|apostolic (?:journey|visit)|pilgrimage|pèlerinage', re.I)
 
 
 def extract(html, url):
@@ -31,11 +35,11 @@ def extract(html, url):
         centered = p.get('align', '').lower() == 'center' or bool(re.search(r'text-align\s*:\s*center', p.get('style', ''), re.I))
         if in_header and centered:
             header.append(text)
-            if DATE_FR.search(text) and not re.search(r'voyage apostolique', text, re.I):
+            if DATE.search(text) and not JOURNEY.search(text):
                 lines = [re.sub(r'\s+', ' ', s).strip() for s in p.get_text('\n', strip=True).splitlines()]
                 before_date = []
                 for line in lines:
-                    if DATE_FR.search(line) or DAY_FR.search(line):
+                    if DATE.search(line) or DAY.search(line):
                         break
                     before_date.append(line)
                 candidate = ' '.join(before_date).strip()
@@ -55,7 +59,7 @@ def extract(html, url):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--corpus', type=Path, default=Path('corpus_francois'))
+    parser.add_argument('--corpus', type=Path, default=Path('corpus_voyages_en'))
     args = parser.parse_args()
     rows, errors = [], []
     for path in sorted(args.corpus.glob('*/*/*/*.json')):
