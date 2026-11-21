@@ -5,7 +5,8 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from preparer_corpus import extract
-from telecharger_discours import collect_one, discover, main
+from telecharger_discours import collect_one, discover, discover_trip, main, trip_dates
+from datetime import date
 import json
 
 URL = 'https://www.vatican.va/content/francesco/fr/speeches/2015/september/documents/papa-francesco_20150925_onu-visita.html'
@@ -35,7 +36,7 @@ class Tests(unittest.TestCase):
 
     def test_interruption_saves_inventory_and_report(self):
         with tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parent) as tmp:
-            with patch('sys.argv', ['collecte', '--years', '2015', '--output', tmp]), \
+            with patch('sys.argv', ['collecte', '--perimetre', 'tout', '--langue', 'fr', '--types', 'speeches', '--years', '2015', '--output', tmp]), \
                  patch('telecharger_discours.discover', return_value=([URL], [])), \
                  patch('telecharger_discours.collect_one', side_effect=KeyboardInterrupt):
                 self.assertEqual(main(), 130)
@@ -53,6 +54,38 @@ class Tests(unittest.TestCase):
         urls, errors = discover(client, index, delay=0)
         self.assertEqual(urls, [URL])
         self.assertEqual(errors, [])
+
+    def test_trip_dates(self):
+        self.assertEqual(trip_dates('Journey to Georgia and Azerbaijan (30 September - 2 October 2016)'),
+                         (date(2016, 9, 30), date(2016, 10, 2)))
+        self.assertEqual(trip_dates('Journey to Mozambique (4 -10 September 2019)'),
+                         (date(2019, 9, 4), date(2019, 9, 10)))
+        self.assertEqual(trip_dates('Journey to Ajaccio (Sunday, 15 December 2024)'),
+                         (date(2024, 12, 15), date(2024, 12, 15)))
+        self.assertIsNone(trip_dates('Journey without dates'))
+
+    def test_trip_keeps_speeches_of_trip_dates_in_same_language(self):
+        trip = 'https://www.vatican.va/content/francesco/en/travels/2015/outside/documents/papa-francesco-cuba-usa-onu-2015.html'
+        month = 'https://www.vatican.va/content/francesco/en/speeches/2015/september.index.html'
+        en = 'https://www.vatican.va/content/francesco/en/speeches/2015/september/documents/'
+        inside, before = en + 'papa-francesco_20150925_onu-visita.html', en + 'papa-francesco_20150910_rome.html'
+        pages = {trip: '<title>Journey to Cuba (19-28 September 2015)</title>'
+                       f'<a href="{URL}">fr</a><a href="{inside.replace("/speeches/", "/homilies/")}">homélie</a>',
+                 month: f'<a href="{inside}">a</a><a href="{before}">b</a>'}
+        client = SimpleNamespace(get=lambda url, timeout: SimpleNamespace(
+            content=pages[url].encode(), url=url, raise_for_status=lambda: None))
+        urls, errors, title, dates = discover_trip(client, trip, ['speeches'], 0, {})
+        self.assertEqual(urls, [inside])
+        self.assertEqual(errors, [])
+        self.assertEqual(dates, (date(2015, 9, 19), date(2015, 9, 28)))
+
+    def test_english_header_venue(self):
+        html = b'''<div class="documento"><p align="center">APOSTOLIC JOURNEY TO SRI LANKA (12-19 JANUARY 2015)</p>
+<p align="center">MEETING WITH FAMILIES</p><p align="center">Mall of Asia Arena, Manila<br>Friday, 16 January 2015</p>
+<p>Dear Families,</p></div>'''
+        row = extract(html, URL.replace('/fr/', '/en/'))
+        self.assertEqual(row['venue_raw'], 'Mall of Asia Arena, Manila')
+        self.assertEqual(row['text'], 'Dear Families,')
 
     def test_place_not_mentioned_country(self):
         row = extract(HTML, URL)
