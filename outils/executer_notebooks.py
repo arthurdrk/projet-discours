@@ -1,4 +1,7 @@
-"""Exécuter les notebooks avec le Python courant, puis sauvegarder leurs sorties."""
+"""Exécuter les notebooks avec le Python courant, sauvegarder leurs sorties et les exporter en HTML.
+
+Usage : python outils/executer_notebooks.py [01 03 ...] [--sans-sauvegarde]
+"""
 import json
 import os
 import sys
@@ -19,12 +22,22 @@ os.environ['MPLCONFIGDIR'] = str(runtime / 'matplotlib')
 
 import nbformat
 from nbclient import NotebookClient
+from nbconvert import HTMLExporter
 
+filtres = [a for a in sys.argv[1:] if not a.startswith('--')]
+sauvegarder = '--sans-sauvegarde' not in sys.argv
+sortie_html = ROOT / 'analyses_html'
+sortie_html.mkdir(exist_ok=True)
 for path in sorted((ROOT / 'notebooks').glob('*.ipynb')):
+    if filtres and not any(path.name.startswith(f) for f in filtres):
+        continue
     print(f'Exécution : {path.name}', flush=True)
     nb = nbformat.read(path, as_version=4)
     nbformat.validate(nb)
-    NotebookClient(nb, timeout=180, kernel_name='projet-discours',
+    NotebookClient(nb, timeout=1200, kernel_name='projet-discours',
                    resources={'metadata': {'path': str(path.parent)}}).execute()
-    nbformat.write(nb, path)
+    if sauvegarder:
+        nbformat.write(nb, path)
+        html, _ = HTMLExporter(template_name='lab').from_notebook_node(nb)
+        (sortie_html / path.with_suffix('.html').name).write_text(html, encoding='utf-8')
     print(f'OK : {path.name}', flush=True)
