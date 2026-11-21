@@ -2,8 +2,11 @@ import re
 from collections import defaultdict
 
 import geonamescache
+import pandas as pd
+import s3fs
 import spacy
 
+fs = s3fs.S3FileSystem(client_kwargs={"endpoint_url": "https://minio.lab.sspcloud.fr"})
 nlp = None
 
 gc = geonamescache.GeonamesCache()
@@ -39,3 +42,13 @@ def city_to_country(locality_name):
     best = max(results, key=lambda c: c["population"])
     return countries[best["countrycode"]]["name"]
 
+
+MY_BUCKET = "avibert"
+FILE_PATH_OUT_S3_Parquet = f"{MY_BUCKET}/diffusion/df_trips.parquet"
+
+with fs.open(FILE_PATH_OUT_S3_Parquet, 'rb') as file_in:
+    df = pd.read_parquet(file_in)
+
+#df["Place_extracted"] = place_extract(df_trips["Place"])
+print(df["Place"].isna().sum())
+df.head(5)
