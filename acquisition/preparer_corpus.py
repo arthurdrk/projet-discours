@@ -7,7 +7,7 @@ Entrée : discours_bruts.parquet (data/ ou S3), produit par telecharger_discours
    le lieu dans l'en-tête (ce qui précède la date), pour attribuer ensuite un pays.
 2. Tri. On écarte (le nombre de textes écartés par raison est affiché) :
    - les textes dont l'en-tête ne mentionne pas le voyage : discours prononcés au
-     Vatican le matin du départ, qui tombent dans les dates du voyage ;
+     Vatican le matin du départ, qui tombent dans les dates du voyage.
    - les conférences de presse et échanges avec les journalistes, surtout dans
      l'avion : ils ne sont pas prononcés dans le pays visité, et le texte contient
      les questions des journalistes.

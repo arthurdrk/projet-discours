@@ -2,7 +2,7 @@
 
 Source : https://www.vatican.va. Méthode en deux étapes :
 
-1. Les voyages. La page de chaque année liste les voyages hors d'Italie ; le titre
+1. Les voyages. La page de chaque année liste les voyages hors d'Italie. Le titre
    d'un voyage contient ses dates, par exemple
    « Apostolic Journey ... to Georgia and Azerbaijan (30 September - 2 October 2016) ».
 2. Les discours. L'index mensuel des discours (rubrique « speeches ») liste tous les
