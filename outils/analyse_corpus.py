@@ -1,0 +1,304 @@
+"""Fonctions d'analyse des discours : chargement, pays, continents, publics et vocabulaire."""
+import re
+
+import numpy as np
+import pandas as pd
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, CountVectorizer
+
+from stockage import lire
+
+# Continents dans l'ordre du nombre de discours. Cet ordre fixe aussi leur couleur.
+ORDRE_CONTINENTS = ["Europe", "Amériques", "Asie", "Moyen-Orient", "Afrique", "Océanie"]
+
+# Pays : code ISO3, puis nom français, nom anglais cherché dans les textes et continent.
+# Limites connues : « Georgia » peut désigner l'État américain et « Jordan » le fleuve.
+PAYS = {
+    "AFG": ("Afghanistan", r"Afghanistan", "Asie"), "ALB": ("Albanie", r"Albania", "Europe"),
+    "DZA": ("Algérie", r"Algeria", "Afrique"), "AGO": ("Angola", r"Angola", "Afrique"),
+    "ARG": ("Argentine", r"Argentina", "Amériques"), "ARM": ("Arménie", r"Armenia", "Moyen-Orient"),
+    "AUS": ("Australie", r"Australia", "Océanie"), "AUT": ("Autriche", r"Austria", "Europe"),
+    "AZE": ("Azerbaïdjan", r"Azerbaijan", "Moyen-Orient"), "BHR": ("Bahreïn", r"Bahrai?n|Bahrein", "Moyen-Orient"),
+    "BGD": ("Bangladesh", r"Bangladesh", "Asie"), "BEL": ("Belgique", r"Belgium", "Europe"),
+    "BEN": ("Bénin", r"Benin", "Afrique"), "BLR": ("Biélorussie", r"Belarus", "Europe"),
+    "BOL": ("Bolivie", r"Bolivia", "Amériques"), "BIH": ("Bosnie-Herzégovine", r"Bosnia", "Europe"),
+    "BRA": ("Brésil", r"Brazil", "Amériques"), "BGR": ("Bulgarie", r"Bulgaria", "Europe"),
+    "BFA": ("Burkina Faso", r"Burkina Faso", "Afrique"), "BDI": ("Burundi", r"Burundi", "Afrique"),
+    "KHM": ("Cambodge", r"Cambodia", "Asie"), "CMR": ("Cameroun", r"Cameroon", "Afrique"),
+    "CAN": ("Canada", r"Canada", "Amériques"), "CAF": ("Centrafrique", r"Central African Republic", "Afrique"),
+    "TCD": ("Tchad", r"Chad", "Afrique"), "CHL": ("Chili", r"Chile", "Amériques"),
+    "CHN": ("Chine", r"China", "Asie"), "COL": ("Colombie", r"Colombia", "Amériques"),
+    "COG": ("Congo-Brazzaville", r"Republic of the Congo|Congo-Brazzaville", "Afrique"),
+    "COD": ("RD Congo", r"Democratic Republic of (?:the )?Congo|DRC|(?<!Republic of the )Congo(?!-Brazzaville)", "Afrique"),
+    "CRI": ("Costa Rica", r"Costa Rica", "Amériques"), "CIV": ("Côte d'Ivoire", r"Côte d[’']Ivoire|Ivory Coast", "Afrique"),
+    "HRV": ("Croatie", r"Croatia", "Europe"), "CUB": ("Cuba", r"Cuba", "Amériques"),
+    "CYP": ("Chypre", r"Cyprus", "Europe"), "CZE": ("Tchéquie", r"Czech Republic|Czechia", "Europe"),
+    "DNK": ("Danemark", r"Denmark", "Europe"), "DOM": ("Rép. dominicaine", r"Dominican Republic", "Amériques"),
+    "ECU": ("Équateur", r"Ecuador", "Amériques"), "EGY": ("Égypte", r"Egypt", "Moyen-Orient"),
+    "SLV": ("Salvador", r"El Salvador", "Amériques"), "ERI": ("Érythrée", r"Eritrea", "Afrique"),
+    "EST": ("Estonie", r"Estonia", "Europe"), "ETH": ("Éthiopie", r"Ethiopia", "Afrique"),
+    "FIN": ("Finlande", r"Finland", "Europe"), "FRA": ("France", r"France", "Europe"),
+    "GAB": ("Gabon", r"Gabon", "Afrique"), "GEO": ("Géorgie", r"Georgia", "Moyen-Orient"),
+    "DEU": ("Allemagne", r"Germany", "Europe"), "GHA": ("Ghana", r"Ghana", "Afrique"),
+    "GRC": ("Grèce", r"Greece", "Europe"), "GTM": ("Guatemala", r"Guatemala", "Amériques"),
+    "HTI": ("Haïti", r"Haiti", "Amériques"), "HND": ("Honduras", r"Honduras", "Amériques"),
+    "HUN": ("Hongrie", r"Hungary", "Europe"), "ISL": ("Islande", r"Iceland", "Europe"),
+    "IND": ("Inde", r"India", "Asie"), "IDN": ("Indonésie", r"Indonesia", "Asie"),
+    "IRN": ("Iran", r"Iran", "Moyen-Orient"), "IRQ": ("Irak", r"Iraq", "Moyen-Orient"),
+    "IRL": ("Irlande", r"(?<!Northern )Ireland", "Europe"), "ISR": ("Israël", r"Israel", "Moyen-Orient"),
+    "ITA": ("Italie", r"Italy", "Europe"), "JAM": ("Jamaïque", r"Jamaica", "Amériques"),
+    "JPN": ("Japon", r"Japan", "Asie"), "JOR": ("Jordanie", r"Jordan", "Moyen-Orient"),
+    "KAZ": ("Kazakhstan", r"Kazakhstan", "Asie"), "KEN": ("Kenya", r"Kenya", "Afrique"),
+    "KOR": ("Corée du Sud", r"Republic of Korea|South Korea|(?<!North )Korea", "Asie"),
+    "PRK": ("Corée du Nord", r"North Korea", "Asie"), "KWT": ("Koweït", r"Kuwait", "Moyen-Orient"),
+    "LAO": ("Laos", r"Laos", "Asie"), "LVA": ("Lettonie", r"Latvia", "Europe"),
+    "LBN": ("Liban", r"Lebanon", "Moyen-Orient"), "LBR": ("Libéria", r"Liberia", "Afrique"),
+    "LBY": ("Libye", r"Libya", "Afrique"), "LTU": ("Lituanie", r"Lithuania", "Europe"),
+    "LUX": ("Luxembourg", r"Luxembourg", "Europe"), "MDG": ("Madagascar", r"Madagascar", "Afrique"),
+    "MWI": ("Malawi", r"Malawi", "Afrique"), "MYS": ("Malaisie", r"Malaysia", "Asie"),
+    "MLI": ("Mali", r"Mali", "Afrique"), "MLT": ("Malte", r"Malta", "Europe"),
+    "MUS": ("Maurice", r"Mauritius", "Afrique"), "MEX": ("Mexique", r"Mexico", "Amériques"),
+    "MDA": ("Moldavie", r"Moldova", "Europe"), "MNG": ("Mongolie", r"Mongolia", "Asie"),
+    "MNE": ("Monténégro", r"Montenegro", "Europe"), "MAR": ("Maroc", r"Morocco", "Afrique"),
+    "MOZ": ("Mozambique", r"Mozambique", "Afrique"), "MMR": ("Myanmar", r"Myanmar|Burma", "Asie"),
+    "NAM": ("Namibie", r"Namibia", "Afrique"), "NPL": ("Népal", r"Nepal", "Asie"),
+    "NLD": ("Pays-Bas", r"Netherlands|Holland", "Europe"), "NZL": ("Nouvelle-Zélande", r"New Zealand", "Océanie"),
+    "NIC": ("Nicaragua", r"Nicaragua", "Amériques"), "NER": ("Niger", r"Niger", "Afrique"),
+    "NGA": ("Nigeria", r"Nigeria", "Afrique"), "MKD": ("Macédoine du Nord", r"North Macedonia|Macedonia", "Europe"),
+    "NOR": ("Norvège", r"Norway", "Europe"), "OMN": ("Oman", r"Oman", "Moyen-Orient"),
+    "PAK": ("Pakistan", r"Pakistan", "Asie"), "PSE": ("Palestine", r"Palestine", "Moyen-Orient"),
+    "PAN": ("Panama", r"Panama", "Amériques"), "PNG": ("Papouasie-Nouvelle-Guinée", r"Papua New Guinea", "Océanie"),
+    "PRY": ("Paraguay", r"Paraguay", "Amériques"), "PER": ("Pérou", r"Peru", "Amériques"),
+    "PHL": ("Philippines", r"Philippines", "Asie"), "POL": ("Pologne", r"Poland", "Europe"),
+    "PRT": ("Portugal", r"Portugal", "Europe"), "QAT": ("Qatar", r"Qatar", "Moyen-Orient"),
+    "ROU": ("Roumanie", r"Romania", "Europe"), "RUS": ("Russie", r"Russia", "Europe"),
+    "RWA": ("Rwanda", r"Rwanda", "Afrique"), "SAU": ("Arabie saoudite", r"Saudi Arabia", "Moyen-Orient"),
+    "SEN": ("Sénégal", r"Senegal", "Afrique"), "SRB": ("Serbie", r"Serbia", "Europe"),
+    "SLE": ("Sierra Leone", r"Sierra Leone", "Afrique"), "SGP": ("Singapour", r"Singapore", "Asie"),
+    "SVK": ("Slovaquie", r"Slovakia", "Europe"), "SVN": ("Slovénie", r"Slovenia", "Europe"),
+    "SOM": ("Somalie", r"Somalia", "Afrique"), "ZAF": ("Afrique du Sud", r"South Africa", "Afrique"),
+    "SSD": ("Soudan du Sud", r"South Sudan", "Afrique"), "SDN": ("Soudan", r"(?<!South )Sudan", "Afrique"),
+    "ESP": ("Espagne", r"Spain", "Europe"), "LKA": ("Sri Lanka", r"Sri Lanka", "Asie"),
+    "SWE": ("Suède", r"Sweden", "Europe"), "CHE": ("Suisse", r"Switzerland", "Europe"),
+    "SYR": ("Syrie", r"Syria", "Moyen-Orient"), "TWN": ("Taïwan", r"Taiwan", "Asie"),
+    "TZA": ("Tanzanie", r"Tanzania", "Afrique"), "THA": ("Thaïlande", r"Thailand", "Asie"),
+    "TLS": ("Timor-Leste", r"Timor-Leste|East Timor|Timor", "Asie"), "TGO": ("Togo", r"Togo", "Afrique"),
+    "TUN": ("Tunisie", r"Tunisia", "Afrique"), "TUR": ("Turquie", r"Turkey|Türkiye", "Moyen-Orient"),
+    "UGA": ("Ouganda", r"Uganda", "Afrique"), "UKR": ("Ukraine", r"Ukraine", "Europe"),
+    "ARE": ("Émirats arabes unis", r"United Arab Emirates|Emirates|UAE", "Moyen-Orient"),
+    "GBR": ("Royaume-Uni", r"United Kingdom|Great Britain|England|Scotland|Wales|Northern Ireland", "Europe"),
+    "USA": ("États-Unis", r"United States(?: of America)?|America(?!s)", "Amériques"),
+    "URY": ("Uruguay", r"Uruguay", "Amériques"), "UZB": ("Ouzbékistan", r"Uzbekistan", "Asie"),
+    "VEN": ("Venezuela", r"Venezuela", "Amériques"), "VNM": ("Viêt Nam", r"Viet ?[Nn]am", "Asie"),
+    "YEM": ("Yémen", r"Yemen", "Moyen-Orient"), "ZMB": ("Zambie", r"Zambia", "Afrique"),
+    "ZWE": ("Zimbabwe", r"Zimbabwe", "Afrique"),
+}
+
+NOM_PAYS = {iso: v[0] for iso, v in PAYS.items()}
+CONTINENT = {iso: v[2] for iso, v in PAYS.items()}
+MOTIFS_PAYS = {iso: re.compile(r"(?<![\w-])(?:" + v[1] + r")(?![\w-])") for iso, v in PAYS.items()}
+MOTIFS_PAYS_I = {iso: re.compile(r"(?<![\w-])(?:" + v[1] + r")(?![\w-])", re.I) for iso, v in PAYS.items()}
+
+# Villes et lieux des en-têtes qui ne contiennent pas le nom du pays.
+LIEUX = {
+    "Rio de Janeiro": "BRA", "Aparecida": "BRA", "Holy Land": ["JOR", "ISR", "PSE"], "Amman": "JOR",
+    "Bethlehem": "PSE", "Jerusalem": "ISR", "Tel Aviv": "ISR", "Tirana": "ALB", "Strasbourg": "FRA",
+    "European Parliament": "FRA", "Council of Europe": "FRA", "Seoul": "KOR", "Daejeon": "KOR",
+    "Haemi": "KOR", "Ankara": "TUR", "Istanbul": "TUR", "Colombo": "LKA", "Madhu": "LKA", "Manila": "PHL",
+    "Tacloban": "PHL", "Palo": "PHL", "Sarajevo": "BIH", "Quito": "ECU", "Guayaquil": "ECU",
+    "La Paz": "BOL", "El Alto": "BOL", "Santa Cruz": "BOL", "Palmasola": "BOL", "Asunción": "PRY",
+    "Havana": "CUB", "Holguín": "CUB", "Santiago de Cuba": "CUB", "Washington": "USA", "New York": "USA",
+    "Philadelphia": "USA", "United Nations": "USA", "Nairobi": "KEN", "Kampala": "UGA", "Namugongo": "UGA",
+    "Bangui": "CAF", "Mexico City": "MEX", "Ecatepec": "MEX", "Chiapas": "MEX", "Morelia": "MEX",
+    "Ciudad Juárez": "MEX", "Lesvos": "GRC", "Lesbos": "GRC", "Mytilene": "GRC", "Yerevan": "ARM",
+    "Gyumri": "ARM", "Kraków": "POL", "Krakow": "POL", "Częstochowa": "POL", "Auschwitz": "POL",
+    "Tbilisi": "GEO", "Mtskheta": "GEO", "Baku": "AZE", "Lund": "SWE", "Malmö": "SWE", "Cairo": "EGY",
+    "Fátima": "PRT", "Fatima": "PRT", "Bogotá": "COL", "Villavicencio": "COL", "Medellín": "COL",
+    "Cartagena": "COL", "Yangon": "MMR", "Nay Pyi Taw": "MMR", "Dhaka": "BGD", "Santiago": "CHL",
+    "Temuco": "CHL", "Iquique": "CHL", "Lima": "PER", "Puerto Maldonado": "PER", "Trujillo": "PER",
+    "Geneva": "CHE", "Dublin": "IRL", "Knock": "IRL", "Vilnius": "LTU", "Kaunas": "LTU", "Riga": "LVA",
+    "Aglona": "LVA", "Tallinn": "EST", "Panama City": "PAN", "Abu Dhabi": "ARE", "Rabat": "MAR",
+    "Sofia": "BGR", "Rakovski": "BGR", "Skopje": "MKD", "Bucharest": "ROU", "Iași": "ROU", "Iasi": "ROU",
+    "Blaj": "ROU", "Maputo": "MOZ", "Antananarivo": "MDG", "Port Louis": "MUS", "Bangkok": "THA",
+    "Tokyo": "JPN", "Nagasaki": "JPN", "Hiroshima": "JPN", "Baghdad": "IRQ", "Najaf": "IRQ", "Ur": "IRQ",
+    "Erbil": "IRQ", "Mosul": "IRQ", "Qaraqosh": "IRQ", "Budapest": "HUN", "Bratislava": "SVK",
+    "Prešov": "SVK", "Košice": "SVK", "Šaštin": "SVK", "Nicosia": "CYP", "Athens": "GRC",
+    "Valletta": "MLT", "Gozo": "MLT", "Edmonton": "CAN", "Québec": "CAN",
+    "Quebec": "CAN", "Iqaluit": "CAN", "Maskwacis": "CAN", "Nur-Sultan": "KAZ", "Astana": "KAZ",
+    "Awali": "BHR", "Manama": "BHR", "Kinshasa": "COD", "Juba": "SSD", "Lisbon": "PRT", "Ulaanbaatar": "MNG",
+    "Marseille": "FRA", "Dubai": "ARE", "Brussels": "BEL", "Leuven": "BEL",
+    "Louvain": "BEL", "Laeken": "BEL", "Koekelberg": "BEL", "Jakarta": "IDN", "Port Moresby": "PNG",
+    "Vanimo": "PNG", "Dili": "TLS", "Ajaccio": "FRA", "Corsica": "FRA",
+}
+
+MOTIFS_LIEUX = [(re.compile(r"(?<![\w-])" + re.escape(lieu) + r"(?![\w-])", re.I), iso) for lieu, iso in LIEUX.items()]
+
+
+def pays_mentionnes(texte):
+    """Pays cités dans un texte, avec leur nombre de mentions, par exemple {"KEN": 3}."""
+    comptes = {iso: len(motif.findall(texte)) for iso, motif in MOTIFS_PAYS.items()}
+    return {iso: n for iso, n in comptes.items() if n}
+
+
+def pays_du_lieu(texte):
+    """Pays désignés par un lieu ou un titre de voyage (nom du pays ou ville connue)."""
+    trouves = {iso for iso, motif in MOTIFS_PAYS_I.items() if motif.search(texte)}
+    for motif, iso in MOTIFS_LIEUX:
+        if motif.search(texte):
+            trouves |= set(iso) if isinstance(iso, list) else {iso}
+    return trouves - {"ITA"}
+
+
+def attribuer_pays(df):
+    """Pays de chaque discours : lieu de l'en-tête, sinon pays unique du voyage, sinon même jour."""
+    pays = []
+    for lieu, entete, titre, voyage in zip(df["venue_raw"], df["header"], df["title"], df["travel_title"]):
+        du_voyage = pays_du_lieu(voyage)
+        candidats = (pays_du_lieu(lieu) & du_voyage) or pays_du_lieu(lieu)
+        if len(candidats) != 1:
+            # La ligne « Apostolic Journey to X and Y » cite tous les pays du voyage : on l'ignore.
+            lignes = "\n".join(l for l in entete.splitlines() if not re.search(r"journey|visit|pilgrimage", l, re.I))
+            candidats = (pays_du_lieu(lignes) | pays_du_lieu(titre)) & du_voyage
+        if len(candidats) != 1 and len(du_voyage) == 1:
+            candidats = du_voyage
+        pays.append(next(iter(candidats)) if len(candidats) == 1 else "")
+    pays = pd.Series(pays, index=df.index)
+    # Un discours encore sans pays prend celui des autres discours du même voyage, le même jour.
+    connus = pd.DataFrame({"voyage": df["travel_title"], "date": df["date"], "pays": pays})[pays != ""]
+    du_jour = connus.groupby(["voyage", "date"])["pays"].agg(lambda x: x.mode().iat[0])
+    for i in pays.index[pays == ""]:
+        pays[i] = du_jour.get((df.at[i, "travel_title"], df.at[i, "date"]), "")
+    return pays
+
+
+# Type de public, d'après le titre du discours. Le premier motif trouvé l'emporte.
+PUBLICS = [
+    ("Autorités et diplomatie", r"authorit|civil society|diplomatic|president|parliament|congress|united nations|"
+                                r"government|king|council of europe|state officials|political|public figures|"
+                                r"world of (?:culture|labou?r|work|business)|leaders of|leaders gathered|"
+                                r"municipal|town hall|golden book"),
+    ("Œcuménisme et dialogue", r"ecumenic|interreligious|inter-religious|religious leaders|jewish|muslim|islam|"
+                               r"orthodox|patriarch|imam|rabbi|lutheran|mosque|synagogue|interfaith|"
+                               r"holy synod|catholicos|sheikh|grand mufti|council of elders|chief rabbinate|"
+                               r"joint declaration|divine liturgy|evangelical|buddhis|sangha|al-azhar|peace conference|"
+                               r"assyrian|chaldean"),
+    ("Évêques", r"bishop|episcopal|cardinal|celam|ordinar"),
+    ("Clergé et religieux", r"priest|clergy|religious|seminarian|consecrated|pastoral (?:agent|worker)|catechist|"
+                            r"jesuit|deacon|novice|nuns|sisters|brothers of"),
+    ("Jeunes et éducation", r"young|youth|student|universit|school|children|vigil"),
+    ("Pauvres, malades, migrants", r"poor|sick|hospital|refugee|migrant|prison|penitentiar|inmate|detain|homeless|"
+                                   r"disabl|charit|victim|elderly|orphan|caritas|needy|displaced|indigenous|"
+                                   r"workers|slum|community of varginha|bañado|medical staff|rehabilitation|popular movements|"
+                                   r"roma? community|akamasoa|casa hogar|bethlehem center"),
+    ("Familles", r"famil"),
+    ("Prière, mémoire, réconciliation", r"shrine|marian|prayer|basilica|cathedral|chapel|candles|memorial|"
+                                        r"yad vashem|genocide|cemetery|holocaust|auschwitz|peace park|tomb|wall|"
+                                        r"reconciliation|nuclear|atomic|martyr|in memory"),
+    ("Accueil et départ", r"welcom|farewell|departure|arrival|greeting to (?:the )?(?:people|faithful|crowd)|"
+                          r"those gathered|population"),
+]
+
+
+def type_public(titre):
+    for nom, motif in PUBLICS:
+        if re.search(motif, titre, re.I):
+            return nom
+    return "Autres rencontres"
+
+
+MOT = re.compile(r"[^\W\d_]+(?:[-'][^\W\d_]+)*")
+MOTS_VIDES = set(ENGLISH_STOP_WORDS) | set("""also would could may might must shall let us one two many much like really
+    even yet ever every today thank thanks thus therefore indeed always never way things thing make made know want
+    see say said go come take give dear brother brothers sister sisters friend friends holy father pope francis mr
+    mrs ladies gentlemen excellency excellencies yes did does doing tell don't it's i'm we're that's let's can't
+    won't isn't there's we've you're they're i've""".split())
+
+
+def mots(texte):
+    """Mots du texte en minuscules (« people's » devient « people »)."""
+    return [re.sub(r"'s$", "", m) for m in MOT.findall(texte.lower().replace("’", "'"))]
+
+
+# Thèmes définis par des listes de mots anglais.
+LEXIQUE = {
+    "Paix et guerre": r"\bpeace\w*|\bwars?\b|\bweapons?\b|\barms\b|\bconflicts?\b|\bnuclear\b|\bviolence\b",
+    "Migrants et réfugiés": r"\bmigra\w*|\brefugees?\b|\bexiles?\b|\bdisplaced\b|\basylum\b",
+    "Pauvreté et exclusion": r"\bpoor\b|\bpoverty\b|\bexclu\w*|\bthrowaway\b|\bmarginali\w*|\binequalit\w*",
+    "Écologie et création": r"\becolog\w*|\bcommon home\b|\bclimate\b|\benvironment\w*|\bplanet\b|\bcreation\b",
+    "Miséricorde et pardon": r"\bmerc(?:y|iful)\b|\bforgive\w*|\bpardon\b",
+    "Famille": r"\bfamil(?:y|ies)\b|\bmarriage\b|\bspouses\b|\bparents\b",
+    "Jeunes": r"\byoung people\b|\byouth\b|\byoung\b",
+    "Personnes âgées": r"\bgrandparents\b|\belderly\b|\bold age\b|\bgrandmothers?\b",
+    "Dialogue interreligieux": r"\binterreligious\b|\bmuslims?\b|\bislam\w*|\bjews?\b|\bjewish\b|\becumeni\w*|\bfraternity\b",
+    "Corruption et justice": r"\bcorrupt\w*|\bjustice\b|\bunjust\w*|\bimpunity\b",
+    "Économie et travail": r"\beconom\w*|\bmoney\b|\bfinanc\w*|\bmarkets?\b|\bwork(?:ers?)?\b|\bjobs?\b|\bunemploy\w*",
+    "Dignité humaine": r"\bdignity\b|\bhuman rights\b",
+    "Mémoire et réconciliation": r"\bmemory\b|\breconcil\w*|\bwounds?\b|\bmartyrs?\b",
+    "Joie et espérance": r"\bjoy\w*|\bhope\w*",
+    "Église en sortie": r"\bmission\w*|\bevangeli\w*|\bperipher\w*|\bgo(?:ing)? out\b",
+}
+
+
+def nom_voyage(titre):
+    """Nom court d'un voyage : « Kenya, Uganda, Central African Republic 2015 »."""
+    annee = re.findall(r"\d{4}", titre)
+    court = re.sub(r"\s*\([^()]*\d{4}\s*\)\s*$", "", titre)
+    court = re.sub(r"^.*?\b(?:to|in)\s+(?:the\s+)?", "", court, count=1)
+    court = re.sub(r"\s*,?\s*(?:on the occasion|for the|and visit to|\(Ecumenical|, \d+\w* World).*$", "", court, flags=re.I)
+    court = re.sub(r",? (?:and )?to (?:the )?", ", ", court)
+    court = re.sub(r"Republic of |Kingdom of |United States of America", lambda m: "USA" if "United" in m.group() else "", court)
+    court = court.replace("Shrine of Our Lady of ", "").replace("European Parliament and the Council of Europe", "Strasbourg")
+    if len(court) > 40:
+        court = court[:38].rsplit(" ", 1)[0] + "…"
+    return f"{court} {annee[-1] if annee else ''}".strip()
+
+
+def charger():
+    """Discours préparés par acquisition/preparer_corpus.py, avec les variables utiles à l'analyse."""
+    df = lire("discours.parquet")
+    df["date"] = pd.to_datetime(df["date"])
+    df["annee"] = df["date"].dt.year
+    df["titre"] = df["title"].str.replace(r"\s*\|.*$", "", regex=True)
+    df["voyage"] = df["travel_title"].map(nom_voyage)
+    df["n_mots"] = df["text"].map(lambda t: len(mots(t)))
+    df["iso"] = attribuer_pays(df)
+    df["pays"] = df["iso"].map(NOM_PAYS)
+    df["continent"] = df["iso"].map(CONTINENT)
+    df["public"] = df["titre"].map(type_public)
+    return df.sort_values("date").reset_index(drop=True)
+
+
+def cite_le_pays_hote(df):
+    """Vrai si le discours nomme le pays où il est prononcé."""
+    return pd.Series([iso in pays_mentionnes(texte) for iso, texte in zip(df["iso"], df["text"])], index=df.index)
+
+
+def taux_lexique(df, groupe):
+    """Mentions de chaque thème pour 10 000 mots, par groupe (une ligne par groupe)."""
+    mentions = pd.DataFrame({theme: df["text"].str.count(motif, flags=re.I) for theme, motif in LEXIQUE.items()})
+    mentions[groupe] = df[groupe]
+    return mentions.groupby(groupe).sum().div(df.groupby(groupe)["n_mots"].sum(), axis=0) * 10_000
+
+
+def mots_caracteristiques(df, groupe, n=8, minimum=10):
+    """Pour chaque groupe d'au moins `minimum` discours, les n mots les plus sur-représentés.
+
+    Score z du log-odds avec a priori de Dirichlet (Monroe, Colaresi et Quinn, 2008) : un score
+    au-dessus de 2 indique un mot nettement plus fréquent dans le groupe que dans le reste du corpus.
+    """
+    vectoriseur = CountVectorizer(analyzer=lambda t: [m for m in mots(t) if len(m) > 2 and m not in MOTS_VIDES], min_df=3)
+    comptes = vectoriseur.fit_transform(df["text"])
+    vocabulaire = vectoriseur.get_feature_names_out()
+    total = np.asarray(comptes.sum(axis=0)).ravel().astype(float)
+    prior = total / total.sum() * 300
+    resultats = {}
+    for valeur, taille in df[groupe].value_counts().items():
+        if taille < minimum:
+            continue
+        a = np.asarray(comptes[(df[groupe] == valeur).to_numpy()].sum(axis=0)).ravel().astype(float)
+        b = total - a
+        la = np.log((a + prior) / (a.sum() + prior.sum() - a - prior))
+        lb = np.log((b + prior) / (b.sum() + prior.sum() - b - prior))
+        z = (la - lb) / np.sqrt(1 / (a + prior) + 1 / (b + prior))
+        meilleurs = np.argsort(z)[::-1][:n]
+        resultats[valeur] = pd.Series(z[meilleurs], index=vocabulaire[meilleurs])
+    return resultats

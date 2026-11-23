@@ -1,8 +1,24 @@
-.deps/
-__pycache__/
+# --- Environnement Python local ---
 .venv/
+.deps/
+.notebook-runtime/
+__pycache__/
+**/.ipynb_checkpoints/
+
+# --- Identifiants (S3 du SSPCloud) : ne jamais les versionner ---
+.env
+
+# --- Données : stockées sur le S3 du SSPCloud, pas dans le dépôt ---
+data/
+corpus_voyages_en/
 corpus_francois/
 donnees_vatican/
-.notebook-runtime/
+*.parquet
+
+# --- Sorties régénérées par les notebooks ---
 resultats/
-**/.ipynb_checkpoints/
+
+# --- Fichiers sans rapport avec ce projet (projet RTE, brouillons) ---
+tmp/
+output/
+notebooks/analyse_consommation_RTE.ipynb

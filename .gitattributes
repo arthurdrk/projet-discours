@@ -1,0 +1,5 @@
+# Fins de ligne normalisées (LF) dans le dépôt, quel que soit le système
+* text=auto
+*.parquet binary
+*.png binary
+*.pdf binary
