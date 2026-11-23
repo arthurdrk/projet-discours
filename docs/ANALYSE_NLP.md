@@ -6,17 +6,17 @@
   (index annuels `travels/<année>/outside.index.html`)
 - Discours : https://www.vatican.va/content/francesco/en/speeches.index.html
 
-Le corpus contient les discours en anglais des 48 voyages apostoliques hors
-d'Italie (2013–2024). Un discours est retenu si sa date tombe pendant un voyage
-et si son en-tête mentionne le voyage. Les homélies ne sont pas incluses
-(`--types speeches homilies` pour les ajouter).
+Le corpus contient les discours en anglais des voyages apostoliques hors
+d'Italie (2013–2024 ; le voyage à Dubaï de 2023, annulé, est écarté). Un discours
+est retenu si sa date tombe pendant un voyage et si son en-tête mentionne le
+voyage. Les conférences de presse et échanges avec les journalistes sont écartés
+(voir `preparer_corpus.py`). Les homélies ne sont pas incluses.
 
 ## Distinguer les lieux
 
 Le pays du discours, le public et les pays évoqués dans le texte sont trois
 informations différentes. Le pays vient de l'en-tête (lieu), du voyage quand il
-ne compte qu'un pays, ou des autres discours du même jour. Les conférences de
-presse dans l'avion sont classées « En vol ».
+ne compte qu'un pays, ou des autres discours du même jour.
 
 ## Questions intéressantes
 
