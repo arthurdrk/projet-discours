@@ -1,86 +1,109 @@
-import tempfile
+"""Tests de la collecte et de la préparation, sans accès au réseau.
+
+Lancer depuis la racine du projet : python -m unittest discover -s tests
+"""
 import unittest
+from datetime import date
 from unittest.mock import patch
-from pathlib import Path
-from types import SimpleNamespace
 
-from preparer_corpus import extract
-from telecharger_discours import collect_one, discover, main
-import json
+import pandas as pd
+from bs4 import BeautifulSoup
 
-URL = 'https://www.vatican.va/content/francesco/fr/speeches/2015/september/documents/papa-francesco_20150925_onu-visita.html'
-HTML = '''<title>ONU</title><div class="documento"><p align="center">VOYAGE APOSTOLIQUE À CUBA<br>(19-28 septembre 2015)</p><p align="center">DISCOURS</p>
-<p align="center">New York<br>Vendredi 25 septembre 2015</p><hr>
-<p>La conférence de Paris et la paix.</p></div>'''.encode()
+from acquisition import preparer_corpus
+from acquisition import telecharger_discours as td
+
+SITE = "https://www.vatican.va/content/francesco/en"
 
 
-class Tests(unittest.TestCase):
-    def test_empty_index_is_reported(self):
-        client = SimpleNamespace(get=lambda url, timeout: SimpleNamespace(
-            content=b'<html>Page indisponible</html>', url=url, raise_for_status=lambda: None))
-        urls, errors = discover(client, 'https://www.vatican.va/content/francesco/fr/speeches/2013.index.html', 0)
-        self.assertEqual(urls, [])
-        self.assertEqual(len(errors), 1)
-
-    def test_year_follows_months_and_deduplicates_documents(self):
-        year = 'https://www.vatican.va/content/francesco/fr/speeches/2015.index.html'
-        month = year.replace('2015.index', '2015/september.index')
-        pages = {year: f'<a href="{month}">Septembre</a><a href="{URL}">Discours</a>',
-                 month: f'<a href="{URL}">Discours</a><a href="{year}">Retour</a>'}
-        client = SimpleNamespace(get=lambda url, timeout: SimpleNamespace(
-            content=pages[url].encode(), url=url, raise_for_status=lambda: None))
-        urls, errors = discover(client, year, 0)
-        self.assertEqual(urls, [URL])
-        self.assertEqual(errors, [])
-
-    def test_interruption_saves_inventory_and_report(self):
-        with tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parent) as tmp:
-            with patch('sys.argv', ['collecte', '--years', '2015', '--output', tmp]), \
-                 patch('telecharger_discours.discover', return_value=([URL], [])), \
-                 patch('telecharger_discours.collect_one', side_effect=KeyboardInterrupt):
-                self.assertEqual(main(), 130)
-            root = Path(tmp)
-            self.assertEqual(json.loads((root / 'inventaire.json').read_text()), [URL])
-            self.assertEqual(json.loads((root / 'bilan_collecte.json').read_text())[0]['status'], 'interrupted')
-
-    def test_discovery_stays_in_month_and_language(self):
-        index = 'https://www.vatican.va/content/francesco/fr/speeches/2015/september.index.html'
-        other_language = URL.replace('/fr/', '/en/')
-        other_month = URL.replace('/september/', '/october/')
-        html = ''.join(f'<a href="{url}">Lien</a>' for url in [URL, other_language, other_month])
-        client = SimpleNamespace(get=lambda url, timeout: SimpleNamespace(
-            content=html.encode(), url=url, raise_for_status=lambda: None))
-        urls, errors = discover(client, index, delay=0)
-        self.assertEqual(urls, [URL])
-        self.assertEqual(errors, [])
-
-    def test_place_not_mentioned_country(self):
-        row = extract(HTML, URL)
-        self.assertEqual(row['venue_raw'], 'New York')
-        self.assertEqual(row['text'], 'La conférence de Paris et la paix.')
-
-    def test_unknown_place(self):
-        row = extract(b'<div class="documento"><p>Paris est cite.</p></div>', URL)
-        self.assertEqual(row['venue_status'], 'unknown')
-        self.assertEqual(row['text'], 'Paris est cite.')
-
-    def test_resume_checks_html(self):
-        class Client:
-            calls = 0
-            def get(self, url, timeout):
-                self.calls += 1
-                return SimpleNamespace(content=HTML, url=url, raise_for_status=lambda: None)
-        c = Client()
-        with tempfile.TemporaryDirectory(dir=Path(__file__).resolve().parent) as tmp:
-            root = Path(tmp)
-            row = collect_one(c, URL, root, delay=0)
-            self.assertTrue((root / row['text_path']).exists())
-            collect_one(c, URL, root, delay=0)
-            self.assertEqual(c.calls, 1)
-            (root / row['html_path']).write_bytes(b'corrupted')
-            collect_one(c, URL, root, delay=0)
-            self.assertEqual(c.calls, 2)
+def faux_site(pages):
+    """Remplace telecharger() : renvoie la page HTML prévue pour chaque adresse."""
+    return lambda url: BeautifulSoup(pages[url], "html.parser")
 
 
-if __name__ == '__main__':
+class Collecte(unittest.TestCase):
+    def setUp(self):
+        td.discours_du_mois.cache_clear()
+
+    def test_dates_du_voyage(self):
+        cas = {
+            "Apostolic Journey to Rio de Janeiro, 28th World Youth Day (22-29 July 2013)": ((2013, 7, 22), (2013, 7, 29)),
+            "Apostolic Journey ... to Georgia and Azerbaijan (30 September - 2 October 2016)": ((2016, 9, 30), (2016, 10, 2)),
+            "Apostolic Journey of Pope Francis to Tirana (Albania) (21 September 2014)": ((2014, 9, 21), (2014, 9, 21)),
+            "Apostolic Journey ... to Portugal ... World Youth Day ( 2-6 August 2023)": ((2023, 8, 2), (2023, 8, 6)),
+            "Apostolic Journey of the Holy Father to Ajaccio (Sunday, 15 December 2024)": ((2024, 12, 15), (2024, 12, 15)),
+            "Apostolic Journey ... to Mozambique, Madagascar and Mauritius (4 -10 September 2019)": ((2019, 9, 4), (2019, 9, 10)),
+        }
+        for titre, (debut, fin) in cas.items():
+            self.assertEqual(td.dates_du_voyage(titre), (date(*debut), date(*fin)), titre)
+
+    def test_lister_voyages_garde_le_titre_et_ecarte_le_voyage_annule(self):
+        armenie = "/content/francesco/en/travels/2016/outside/documents/papa-francesco-armenia-2016.html"
+        dubai = "/content/francesco/en/travels/2016/outside/documents/dubai-2023.html"
+        page = (f'<a href="{armenie}">Apostolic Journey of the Holy Father to Armenia (24-26 June 2016)</a>'
+                f'<a href="{armenie}">EN</a><a href="{armenie.replace("/en/", "/fr/")}">FR</a>'
+                f'<a href="{dubai}">Apostolic Journey to Dubai (1-3 December 2023)</a>')
+        with patch.object(td, "ANNEES", [2016]), \
+             patch.object(td, "telecharger", faux_site({f"{SITE}/travels/2016/outside.index.html": page})):
+            voyages = td.lister_voyages()
+        self.assertEqual(len(voyages), 1)
+        voyage = voyages.iloc[0]
+        self.assertEqual(voyage["travel_url"], "https://www.vatican.va" + armenie)
+        self.assertEqual((voyage["travel_start"], voyage["travel_end"]), (date(2016, 6, 24), date(2016, 6, 26)))
+
+    def test_discours_du_voyage_garde_les_dates_du_voyage_sur_deux_mois(self):
+        sept = (f'<a href="{SITE}/speeches/2016/september/documents/papa-francesco_20160929_vatican.html">Vatican</a>'
+                f'<a href="{SITE}/speeches/2016/september/documents/papa-francesco_20160930_georgia-autorita.html">Tbilisi</a>'
+                f'<a href="https://www.vatican.va/content/francesco/fr/speeches/2016/september/documents/'
+                f'papa-francesco_20160930_georgia-autorita.html">FR</a>')
+        octo = (f'<a href="{SITE}/speeches/2016/october/documents/20161002-azerbaijan-baku.html">Baku</a>'
+                f'<a href="{SITE}/speeches/2016/october/documents/papa-francesco_20161003_rome.html">Rome</a>')
+        pages = {f"{SITE}/speeches/2016/september.index.html": sept, f"{SITE}/speeches/2016/october.index.html": octo}
+        voyage = {"travel_start": date(2016, 9, 30), "travel_end": date(2016, 10, 2)}
+        with patch.object(td, "telecharger", faux_site(pages)):
+            discours = td.discours_du_voyage(voyage)
+        self.assertEqual(sorted(u.rsplit("/", 1)[-1] for u in discours),
+                         ["20161002-azerbaijan-baku.html", "papa-francesco_20160930_georgia-autorita.html"])
+        self.assertEqual(discours[f"{SITE}/speeches/2016/october/documents/20161002-azerbaijan-baku.html"], date(2016, 10, 2))
+
+
+ENTETE = ('<div class="documento"><p align="center">APOSTOLIC JOURNEY TO SRI LANKA AND THE PHILIPPINES<br>'
+          '(12-19 JANUARY 2015)</p><p align="center">MEETING WITH FAMILIES</p>'
+          '<p align="center">Mall of Asia Arena, Manila<br>Friday, 16 January 2015</p>'
+          '<p>Dear Families,</p><p>Thank you.</p><p>© Copyright - Libreria Editrice Vaticana</p></div>')
+
+
+class Preparation(unittest.TestCase):
+    def test_decouper_separe_en_tete_corps_et_lieu(self):
+        en_tete, corps, lieu = preparer_corpus.decouper(ENTETE)
+        self.assertEqual(lieu, "Mall of Asia Arena, Manila")
+        self.assertTrue(en_tete.startswith("APOSTOLIC JOURNEY"))
+        self.assertEqual(corps, "Dear Families,\n\nThank you.")
+
+    def test_decouper_lit_une_date_en_italien(self):
+        html = ('<div class="documento"><p align="center">MEETING WITH PRIESTS</p>'
+                '<p align="center">St Peter’s Parish (Bangkok)<br>Venerdì, 22 novembre 2019</p><p>Dear brothers,</p></div>')
+        self.assertEqual(preparer_corpus.decouper(html)[2], "St Peter’s Parish (Bangkok)")
+
+    def test_decouper_sans_en_tete(self):
+        self.assertEqual(preparer_corpus.decouper('<div class="documento"><p>Texte seul.</p></div>'), ("", "Texte seul.", ""))
+
+    def test_tri_ecarte_vatican_et_presse(self):
+        vatican = ('<div class="documento"><p align="center">ADDRESS TO THE DIPLOMATIC CORPS</p>'
+                   '<p align="center">Sala Regia<br>Monday, 12 January 2015</p><p>Excellencies,</p></div>')
+        bruts = pd.DataFrame({
+            "source_url": [f"{SITE}/speeches/x/documents/{n}.html" for n in ("famille", "vatican", "presse")],
+            "title": ["Meeting with families | Francis", "To the Diplomatic Corps | Francis",
+                      "In-Flight Press Conference | Francis"],
+            "travel_title": ["Sri Lanka"] * 3, "date": ["2015-01-16", "2015-01-12", "2015-01-19"],
+            "html": [ENTETE, vatican, ENTETE],
+        })
+        sorties = {}
+        with patch.object(preparer_corpus, "lire", return_value=bruts), \
+             patch.object(preparer_corpus, "enregistrer", lambda df, nom: sorties.__setitem__(nom, df)):
+            preparer_corpus.main()
+        self.assertEqual(list(sorties), ["discours.parquet"])
+        self.assertEqual(sorties["discours.parquet"]["event_id"].tolist(), ["famille"])
+
+
+if __name__ == "__main__":
     unittest.main()
