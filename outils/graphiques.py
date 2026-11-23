@@ -1,8 +1,6 @@
-"""Couleurs et réglages communs aux graphiques du rapport."""
-import matplotlib as mpl
-import numpy as np
-from matplotlib import font_manager
-from matplotlib.colors import LinearSegmentedColormap
+"""Couleurs et mise en forme communes aux graphiques du rapport (Plotly)."""
+import plotly.graph_objects as go
+import plotly.io as pio
 
 from analyse_corpus import ORDRE_CONTINENTS
 
@@ -12,6 +10,7 @@ ENCRE_2 = "#52514e"
 GRIS = "#898781"
 GRILLE = "#e1e0d9"
 AXE = "#c3c2b7"
+POLICE = "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"
 
 # Une couleur par catégorie, toujours dans le même ordre (testé pour les daltonismes courants).
 COULEURS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]
@@ -20,47 +19,45 @@ COULEUR_CONTINENT = dict(zip(ORDRE_CONTINENTS, COULEURS))
 # Dégradé d'une seule teinte, du plus clair au plus foncé, pour les intensités.
 BLEUS = ["#cde2fb", "#b7d3f6", "#9ec5f4", "#86b6ef", "#6da7ec", "#5598e7", "#3987e5",
          "#2a78d6", "#256abf", "#1c5cab", "#184f95", "#104281", "#0d366b"]
-DEGRADE = LinearSegmentedColormap.from_list("bleus", BLEUS)
+ECHELLE_BLEUE = [[i / (len(BLEUS) - 1), couleur] for i, couleur in enumerate(BLEUS)]
 
 
 def style():
-    """Style sobre : fond clair, grille discrète, titres alignés à gauche."""
-    installees = {f.name for f in font_manager.fontManager.ttflist}
-    polices = [p for p in ("Segoe UI", "DejaVu Sans") if p in installees] + ["sans-serif"]
-    mpl.rcParams.update({
-        "figure.facecolor": FOND, "axes.facecolor": FOND, "savefig.facecolor": FOND,
-        "figure.dpi": 110, "font.family": polices, "font.size": 10.5,
-        "axes.edgecolor": AXE, "axes.labelcolor": ENCRE_2, "axes.titlecolor": ENCRE,
-        "axes.titlesize": 13, "axes.titleweight": "semibold", "axes.titlelocation": "left", "axes.titlepad": 12,
-        "axes.spines.top": False, "axes.spines.right": False,
-        "axes.grid": True, "grid.color": GRILLE, "grid.linewidth": .8, "axes.axisbelow": True,
-        "xtick.color": AXE, "ytick.color": AXE, "xtick.labelcolor": ENCRE_2, "ytick.labelcolor": ENCRE_2,
-        "legend.frameon": False, "legend.labelcolor": ENCRE_2,
-        "lines.linewidth": 2, "lines.solid_capstyle": "round",
-    })
+    """Modèle Plotly du rapport : fond clair, grille discrète, titres alignés à gauche."""
+    pio.templates["rapport"] = go.layout.Template(layout=dict(
+        font=dict(family=POLICE, size=13, color=ENCRE_2),
+        paper_bgcolor=FOND, plot_bgcolor=FOND, colorway=COULEURS,
+        title=dict(x=0.01, xref="container", xanchor="left", y=1, yref="container", yanchor="top",
+                   pad=dict(t=16), font=dict(size=18, color=ENCRE)),
+        xaxis=dict(gridcolor=GRILLE, linecolor=AXE, showline=True, zeroline=False, showgrid=False),
+        yaxis=dict(gridcolor=GRILLE, linecolor=AXE, showline=False, zeroline=False, showgrid=False),
+        legend=dict(orientation="h", x=0, xanchor="left", y=1.0, yanchor="bottom"),
+        hoverlabel=dict(bgcolor="white", bordercolor=GRILLE, font=dict(family=POLICE, size=12, color=ENCRE)),
+        annotationdefaults=dict(font=dict(size=14, color=ENCRE)),
+        margin=dict(l=20, r=30, b=50),
+        bargap=0.35,
+    ))
+    pio.templates.default = "plotly_white+rapport"
+    pio.renderers.default = "plotly_mimetype+notebook_connected"
 
 
-def titre(ax, texte, sous_titre=None):
-    """Titre du graphique, avec une petite ligne grise en dessous pour dire ce qui est mesuré."""
-    ax.set_title(texte, pad=26 if sous_titre else 12)
-    if sous_titre:
-        ax.annotate(sous_titre, xy=(0, 1), xycoords="axes fraction", xytext=(0, 8), textcoords="offset points",
-                    fontsize=9.5, color=GRIS, va="bottom")
+def titre(fig, texte, sous_titre=None, hauteur=450, marge_haute=0):
+    """Titre, petite ligne grise en dessous et hauteur du graphique."""
+    legende = sum(1 for trace in fig.data if trace.showlegend is not False and trace.name) > 1
+    haut = 60 + (25 if sous_titre else 0) + (30 if legende else 0) + marge_haute
+    fig.update_layout(height=hauteur, legend_title_text="", margin_t=haut,
+                      title=dict(text=texte, subtitle=dict(text=sous_titre or "", font=dict(size=13, color=GRIS))))
+    return fig
 
 
-def carte_chaleur(ax, valeurs, couleurs=None, fmt="{:.0f}"):
-    """Tableau coloré : chaque case porte sa valeur, en blanc sur les cases foncées."""
-    couleurs = valeurs if couleurs is None else couleurs
-    ax.imshow(couleurs.to_numpy(dtype=float), cmap=DEGRADE, aspect="auto", vmin=0)
-    seuil = np.nanmax(couleurs.to_numpy(dtype=float)) * .6
-    for i in range(valeurs.shape[0]):
-        for j in range(valeurs.shape[1]):
-            ax.text(j, i, fmt.format(valeurs.iat[i, j]), ha="center", va="center", fontsize=9,
-                    color="white" if couleurs.iat[i, j] > seuil else ENCRE)
-    ax.set_xticks(range(valeurs.shape[1]), valeurs.columns)
-    ax.set_yticks(range(valeurs.shape[0]), valeurs.index)
-    ax.xaxis.tick_top()
-    ax.tick_params(length=0)
-    ax.grid(False)
-    for bord in ax.spines.values():
-        bord.set_visible(False)
+def carte_chaleur(valeurs, texte, sous_titre=None):
+    """Tableau coloré ligne par ligne : case la plus foncée au maximum de la ligne, la plus claire au minimum."""
+    relatif = valeurs.sub(valeurs.min(axis=1), axis=0).div(valeurs.max(axis=1) - valeurs.min(axis=1), axis=0)
+    fig = go.Figure(go.Heatmap(
+        z=relatif, x=list(valeurs.columns), y=list(valeurs.index), customdata=valeurs,
+        text=valeurs.round(0).astype(int), texttemplate="%{text}", colorscale=ECHELLE_BLEUE, showscale=False,
+        xgap=2, ygap=2, hovertemplate="%{y}, %{x}<br>%{customdata:.1f} mentions pour 10 000 mots<extra></extra>"))
+    fig.update_xaxes(side="top", showline=False)
+    fig.update_yaxes(autorange="reversed")
+    lignes = max(str(colonne).count("<br>") + 1 for colonne in valeurs.columns)
+    return titre(fig, texte, sous_titre, hauteur=38 * len(valeurs) + 170 + 18 * lignes, marge_haute=18 * lignes)
