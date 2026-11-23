@@ -7810,7 +7810,7 @@ comparés par continent, par public et par année.</li>
 <li>Les références : papes, saints, concile, grands textes du pontificat.</li>
 <li>Le style : longueur des phrases selon le public.</li>
 </ol>
-<p>Toutes les fréquences sont des <strong>taux pour 10 000 mots</strong>. Les conférences de presse en vol sont exclues du corpus (<code>preparer_corpus.py</code>).</p>
+<p>Toutes les fréquences sont des <strong>taux pour 10 000 mots</strong>. Les conférences de presse en vol sont exclues du corpus (<code>acquisition/preparer_corpus.py</code>).</p>
 </div>
 </div>
 </div>
@@ -7824,7 +7824,7 @@ comparés par continent, par public et par année.</li>
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="n">ROOT</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s2">"telecharger_discours.py"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span>
+<span class="n">ROOT</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s2">"outils"</span> <span class="o">/</span> <span class="s2">"analyse_corpus.py"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s2">"outils"</span><span class="p">))</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -8046,117 +8046,117 @@ les autres mots montrent comment le discours s'adapte.</p>
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <style type="text/css">
-#T_2e7a8_row0_col0, #T_2e7a8_row0_col1, #T_2e7a8_row0_col2, #T_2e7a8_row0_col3, #T_2e7a8_row0_col4, #T_2e7a8_row1_col0, #T_2e7a8_row1_col1, #T_2e7a8_row1_col2, #T_2e7a8_row1_col3, #T_2e7a8_row1_col4, #T_2e7a8_row2_col0, #T_2e7a8_row2_col1, #T_2e7a8_row2_col2, #T_2e7a8_row2_col3, #T_2e7a8_row2_col4, #T_2e7a8_row3_col0, #T_2e7a8_row3_col1, #T_2e7a8_row3_col2, #T_2e7a8_row3_col3, #T_2e7a8_row3_col4, #T_2e7a8_row4_col0, #T_2e7a8_row4_col1, #T_2e7a8_row4_col2, #T_2e7a8_row4_col3, #T_2e7a8_row4_col4, #T_2e7a8_row5_col0, #T_2e7a8_row5_col1, #T_2e7a8_row5_col2, #T_2e7a8_row5_col3, #T_2e7a8_row5_col4, #T_2e7a8_row6_col0, #T_2e7a8_row6_col1, #T_2e7a8_row6_col2, #T_2e7a8_row6_col3, #T_2e7a8_row6_col4, #T_2e7a8_row7_col0, #T_2e7a8_row7_col1, #T_2e7a8_row7_col2, #T_2e7a8_row7_col3, #T_2e7a8_row7_col4, #T_2e7a8_row8_col0, #T_2e7a8_row8_col1, #T_2e7a8_row8_col2, #T_2e7a8_row8_col3, #T_2e7a8_row8_col4, #T_2e7a8_row9_col0, #T_2e7a8_row9_col1, #T_2e7a8_row9_col2, #T_2e7a8_row9_col3, #T_2e7a8_row9_col4, #T_2e7a8_row10_col0, #T_2e7a8_row10_col1, #T_2e7a8_row10_col2, #T_2e7a8_row10_col3, #T_2e7a8_row10_col4, #T_2e7a8_row11_col0, #T_2e7a8_row11_col1, #T_2e7a8_row11_col2, #T_2e7a8_row11_col3, #T_2e7a8_row11_col4 {
+#T_84855_row0_col0, #T_84855_row0_col1, #T_84855_row0_col2, #T_84855_row0_col3, #T_84855_row0_col4, #T_84855_row1_col0, #T_84855_row1_col1, #T_84855_row1_col2, #T_84855_row1_col3, #T_84855_row1_col4, #T_84855_row2_col0, #T_84855_row2_col1, #T_84855_row2_col2, #T_84855_row2_col3, #T_84855_row2_col4, #T_84855_row3_col0, #T_84855_row3_col1, #T_84855_row3_col2, #T_84855_row3_col3, #T_84855_row3_col4, #T_84855_row4_col0, #T_84855_row4_col1, #T_84855_row4_col2, #T_84855_row4_col3, #T_84855_row4_col4, #T_84855_row5_col0, #T_84855_row5_col1, #T_84855_row5_col2, #T_84855_row5_col3, #T_84855_row5_col4, #T_84855_row6_col0, #T_84855_row6_col1, #T_84855_row6_col2, #T_84855_row6_col3, #T_84855_row6_col4, #T_84855_row7_col0, #T_84855_row7_col1, #T_84855_row7_col2, #T_84855_row7_col3, #T_84855_row7_col4, #T_84855_row8_col0, #T_84855_row8_col1, #T_84855_row8_col2, #T_84855_row8_col3, #T_84855_row8_col4, #T_84855_row9_col0, #T_84855_row9_col1, #T_84855_row9_col2, #T_84855_row9_col3, #T_84855_row9_col4, #T_84855_row10_col0, #T_84855_row10_col1, #T_84855_row10_col2, #T_84855_row10_col3, #T_84855_row10_col4, #T_84855_row11_col0, #T_84855_row11_col1, #T_84855_row11_col2, #T_84855_row11_col3, #T_84855_row11_col4 {
   font-size: 11.5px;
 }
 </style>
-<table id="T_2e7a8">
+<table id="T_84855">
 <thead>
 <tr>
 <th class="blank level0"> </th>
-<th class="col_heading level0 col0" id="T_2e7a8_level0_col0">Europe</th>
-<th class="col_heading level0 col1" id="T_2e7a8_level0_col1">Asie</th>
-<th class="col_heading level0 col2" id="T_2e7a8_level0_col2">Afrique</th>
-<th class="col_heading level0 col3" id="T_2e7a8_level0_col3">Amériques</th>
-<th class="col_heading level0 col4" id="T_2e7a8_level0_col4">Moyen-Orient</th>
+<th class="col_heading level0 col0" id="T_84855_level0_col0">Europe</th>
+<th class="col_heading level0 col1" id="T_84855_level0_col1">Asie</th>
+<th class="col_heading level0 col2" id="T_84855_level0_col2">Afrique</th>
+<th class="col_heading level0 col3" id="T_84855_level0_col3">Amériques</th>
+<th class="col_heading level0 col4" id="T_84855_level0_col4">Moyen-Orient</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<th class="row_heading level0 row0" id="T_2e7a8_level0_row0">0</th>
-<td class="data row0 col0" id="T_2e7a8_row0_col0">europe (12.8)</td>
-<td class="data row0 col1" id="T_2e7a8_row0_col1">fragrance (8.4)</td>
-<td class="data row0 col2" id="T_2e7a8_row0_col2">africa (9.5)</td>
-<td class="data row0 col3" id="T_2e7a8_row0_col3">latin (8.5)</td>
-<td class="data row0 col4" id="T_2e7a8_row0_col4">peace (14.4)</td>
+<th class="row_heading level0 row0" id="T_84855_level0_row0">0</th>
+<td class="data row0 col0" id="T_84855_row0_col0">europe (12.8)</td>
+<td class="data row0 col1" id="T_84855_row0_col1">fragrance (8.4)</td>
+<td class="data row0 col2" id="T_84855_row0_col2">africa (9.5)</td>
+<td class="data row0 col3" id="T_84855_row0_col3">latin (8.5)</td>
+<td class="data row0 col4" id="T_84855_row0_col4">peace (14.4)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row1" id="T_2e7a8_level0_row1">1</th>
-<td class="data row1 col0" id="T_2e7a8_row1_col0">european (8.2)</td>
-<td class="data row1 col1" id="T_2e7a8_row1_col1">harmony (7.6)</td>
-<td class="data row1 col2" id="T_2e7a8_row1_col2">violence (9.0)</td>
-<td class="data row1 col3" id="T_2e7a8_row1_col3">america (8.0)</td>
-<td class="data row1 col4" id="T_2e7a8_row1_col4">egypt (9.5)</td>
+<th class="row_heading level0 row1" id="T_84855_level0_row1">1</th>
+<td class="data row1 col0" id="T_84855_row1_col0">european (8.2)</td>
+<td class="data row1 col1" id="T_84855_row1_col1">harmony (7.6)</td>
+<td class="data row1 col2" id="T_84855_row1_col2">violence (9.0)</td>
+<td class="data row1 col3" id="T_84855_row1_col3">america (8.0)</td>
+<td class="data row1 col4" id="T_84855_row1_col4">egypt (9.5)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row2" id="T_2e7a8_level0_row2">2</th>
-<td class="data row2 col0" id="T_2e7a8_row2_col0">roots (7.9)</td>
-<td class="data row2 col1" id="T_2e7a8_row2_col1">asia (7.5)</td>
-<td class="data row2 col2" id="T_2e7a8_row2_col2">moses (9.0)</td>
-<td class="data row2 col3" id="T_2e7a8_row2_col3">family (7.7)</td>
-<td class="data row2 col4" id="T_2e7a8_row2_col4">east (9.0)</td>
+<th class="row_heading level0 row2" id="T_84855_level0_row2">2</th>
+<td class="data row2 col0" id="T_84855_row2_col0">roots (7.9)</td>
+<td class="data row2 col1" id="T_84855_row2_col1">asia (7.5)</td>
+<td class="data row2 col2" id="T_84855_row2_col2">moses (9.0)</td>
+<td class="data row2 col3" id="T_84855_row2_col3">family (7.7)</td>
+<td class="data row2 col4" id="T_84855_row2_col4">east (9.0)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row3" id="T_2e7a8_level0_row3">3</th>
-<td class="data row3 col0" id="T_2e7a8_row3_col0">sea (7.7)</td>
-<td class="data row3 col1" id="T_2e7a8_row3_col1">religious (6.5)</td>
-<td class="data row3 col2" id="T_2e7a8_row3_col2">hands (8.7)</td>
-<td class="data row3 col3" id="T_2e7a8_row3_col3">jesus (7.0)</td>
-<td class="data row3 col4" id="T_2e7a8_row3_col4">abraham (8.6)</td>
+<th class="row_heading level0 row3" id="T_84855_level0_row3">3</th>
+<td class="data row3 col0" id="T_84855_row3_col0">sea (7.7)</td>
+<td class="data row3 col1" id="T_84855_row3_col1">religious (6.5)</td>
+<td class="data row3 col2" id="T_84855_row3_col2">hands (8.7)</td>
+<td class="data row3 col3" id="T_84855_row3_col3">jesus (7.0)</td>
+<td class="data row3 col4" id="T_84855_row3_col4">abraham (8.6)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row4" id="T_2e7a8_level0_row4">4</th>
-<td class="data row4 col0" id="T_2e7a8_row4_col0">bridge (6.4)</td>
-<td class="data row4 col1" id="T_2e7a8_row4_col1">respect (6.4)</td>
-<td class="data row4 col2" id="T_2e7a8_row4_col2">country (8.2)</td>
-<td class="data row4 col3" id="T_2e7a8_row4_col3">indigenous (6.8)</td>
-<td class="data row4 col4" id="T_2e7a8_row4_col4">unity (8.0)</td>
+<th class="row_heading level0 row4" id="T_84855_level0_row4">4</th>
+<td class="data row4 col0" id="T_84855_row4_col0">bridge (6.4)</td>
+<td class="data row4 col1" id="T_84855_row4_col1">respect (6.4)</td>
+<td class="data row4 col2" id="T_84855_row4_col2">country (8.2)</td>
+<td class="data row4 col3" id="T_84855_row4_col3">indigenous (6.8)</td>
+<td class="data row4 col4" id="T_84855_row4_col4">unity (8.0)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row5" id="T_2e7a8_level0_row5">5</th>
-<td class="data row5 col0" id="T_2e7a8_row5_col0">parish (5.2)</td>
-<td class="data row5 col1" id="T_2e7a8_row5_col1">religions (6.0)</td>
-<td class="data row5 col2" id="T_2e7a8_row5_col2">republic (7.6)</td>
-<td class="data row5 col3" id="T_2e7a8_row5_col3">families (6.8)</td>
-<td class="data row5 col4" id="T_2e7a8_row5_col4">holiness (8.0)</td>
+<th class="row_heading level0 row5" id="T_84855_level0_row5">5</th>
+<td class="data row5 col0" id="T_84855_row5_col0">parish (5.2)</td>
+<td class="data row5 col1" id="T_84855_row5_col1">religions (6.0)</td>
+<td class="data row5 col2" id="T_84855_row5_col2">republic (7.6)</td>
+<td class="data row5 col3" id="T_84855_row5_col3">families (6.8)</td>
+<td class="data row5 col4" id="T_84855_row5_col4">holiness (8.0)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row6" id="T_2e7a8_level0_row6">6</th>
-<td class="data row6 col0" id="T_2e7a8_row6_col0">bread (5.1)</td>
-<td class="data row6 col1" id="T_2e7a8_row6_col1">nuclear (5.9)</td>
-<td class="data row6 col2" id="T_2e7a8_row6_col2">african (7.5)</td>
-<td class="data row6 col3" id="T_2e7a8_row6_col3">youth (5.9)</td>
-<td class="data row6 col4" id="T_2e7a8_row6_col4">violence (7.3)</td>
+<th class="row_heading level0 row6" id="T_84855_level0_row6">6</th>
+<td class="data row6 col0" id="T_84855_row6_col0">bread (5.1)</td>
+<td class="data row6 col1" id="T_84855_row6_col1">nuclear (5.9)</td>
+<td class="data row6 col2" id="T_84855_row6_col2">african (7.5)</td>
+<td class="data row6 col3" id="T_84855_row6_col3">youth (5.9)</td>
+<td class="data row6 col4" id="T_84855_row6_col4">violence (7.3)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row7" id="T_2e7a8_level0_row7">7</th>
-<td class="data row7 col0" id="T_2e7a8_row7_col0">union (4.9)</td>
-<td class="data row7 col1" id="T_2e7a8_row7_col1">spiritual (5.7)</td>
-<td class="data row7 col2" id="T_2e7a8_row7_col2">corruption (7.0)</td>
-<td class="data row7 col3" id="T_2e7a8_row7_col3">aparecida (5.9)</td>
-<td class="data row7 col4" id="T_2e7a8_row7_col4">middle (7.3)</td>
+<th class="row_heading level0 row7" id="T_84855_level0_row7">7</th>
+<td class="data row7 col0" id="T_84855_row7_col0">union (4.9)</td>
+<td class="data row7 col1" id="T_84855_row7_col1">spiritual (5.7)</td>
+<td class="data row7 col2" id="T_84855_row7_col2">corruption (7.0)</td>
+<td class="data row7 col3" id="T_84855_row7_col3">aparecida (5.9)</td>
+<td class="data row7 col4" id="T_84855_row7_col4">middle (7.3)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row8" id="T_2e7a8_level0_row8">8</th>
-<td class="data row8 col0" id="T_2e7a8_row8_col0">island (4.7)</td>
-<td class="data row8 col1" id="T_2e7a8_row8_col1">poor (5.5)</td>
-<td class="data row8 col2" id="T_2e7a8_row8_col2">shepherd (6.8)</td>
-<td class="data row8 col3" id="T_2e7a8_row8_col3">pastor (5.5)</td>
-<td class="data row8 col4" id="T_2e7a8_row8_col4">religions (7.2)</td>
+<th class="row_heading level0 row8" id="T_84855_level0_row8">8</th>
+<td class="data row8 col0" id="T_84855_row8_col0">island (4.7)</td>
+<td class="data row8 col1" id="T_84855_row8_col1">poor (5.5)</td>
+<td class="data row8 col2" id="T_84855_row8_col2">shepherd (6.8)</td>
+<td class="data row8 col3" id="T_84855_row8_col3">pastor (5.5)</td>
+<td class="data row8 col4" id="T_84855_row8_col4">religions (7.2)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row9" id="T_2e7a8_level0_row9">9</th>
-<td class="data row9 col0" id="T_2e7a8_row9_col0">adventure (4.7)</td>
-<td class="data row9 col1" id="T_2e7a8_row9_col1">healing (5.4)</td>
-<td class="data row9 col2" id="T_2e7a8_row9_col2">south (6.1)</td>
-<td class="data row9 col3" id="T_2e7a8_row9_col3">peoples (5.4)</td>
-<td class="data row9 col4" id="T_2e7a8_row9_col4">fraternity (7.2)</td>
+<th class="row_heading level0 row9" id="T_84855_level0_row9">9</th>
+<td class="data row9 col0" id="T_84855_row9_col0">adventure (4.7)</td>
+<td class="data row9 col1" id="T_84855_row9_col1">healing (5.4)</td>
+<td class="data row9 col2" id="T_84855_row9_col2">south (6.1)</td>
+<td class="data row9 col3" id="T_84855_row9_col3">peoples (5.4)</td>
+<td class="data row9 col4" id="T_84855_row9_col4">fraternity (7.2)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row10" id="T_2e7a8_level0_row10">10</th>
-<td class="data row10 col0" id="T_2e7a8_row10_col0">tenderness (4.6)</td>
-<td class="data row10 col1" id="T_2e7a8_row10_col1">bullying (5.3)</td>
-<td class="data row10 col2" id="T_2e7a8_row10_col2">central (5.9)</td>
-<td class="data row10 col3" id="T_2e7a8_row10_col3">face (5.4)</td>
-<td class="data row10 col4" id="T_2e7a8_row10_col4">christians (7.1)</td>
+<th class="row_heading level0 row10" id="T_84855_level0_row10">10</th>
+<td class="data row10 col0" id="T_84855_row10_col0">tenderness (4.6)</td>
+<td class="data row10 col1" id="T_84855_row10_col1">bullying (5.3)</td>
+<td class="data row10 col2" id="T_84855_row10_col2">central (5.9)</td>
+<td class="data row10 col3" id="T_84855_row10_col3">face (5.4)</td>
+<td class="data row10 col4" id="T_84855_row10_col4">christians (7.1)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row11" id="T_2e7a8_level0_row11">11</th>
-<td class="data row11 col0" id="T_2e7a8_row11_col0">greek (4.6)</td>
-<td class="data row11 col1" id="T_2e7a8_row11_col1">missionaries (5.3)</td>
-<td class="data row11 col2" id="T_2e7a8_row11_col2">sudan (5.9)</td>
-<td class="data row11 col3" id="T_2e7a8_row11_col3">native (5.4)</td>
-<td class="data row11 col4" id="T_2e7a8_row11_col4">iraq (7.0)</td>
+<th class="row_heading level0 row11" id="T_84855_level0_row11">11</th>
+<td class="data row11 col0" id="T_84855_row11_col0">greek (4.6)</td>
+<td class="data row11 col1" id="T_84855_row11_col1">missionaries (5.3)</td>
+<td class="data row11 col2" id="T_84855_row11_col2">sudan (5.9)</td>
+<td class="data row11 col3" id="T_84855_row11_col3">native (5.4)</td>
+<td class="data row11 col4" id="T_84855_row11_col4">iraq (7.0)</td>
 </tr>
 </tbody>
 </table>
@@ -8247,169 +8247,169 @@ les autres mots montrent comment le discours s'adapte.</p>
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <style type="text/css">
-#T_51ee7_row0_col0, #T_51ee7_row0_col1, #T_51ee7_row0_col2, #T_51ee7_row0_col3, #T_51ee7_row0_col4, #T_51ee7_row0_col5, #T_51ee7_row0_col6, #T_51ee7_row0_col7, #T_51ee7_row0_col8, #T_51ee7_row1_col0, #T_51ee7_row1_col1, #T_51ee7_row1_col2, #T_51ee7_row1_col3, #T_51ee7_row1_col4, #T_51ee7_row1_col5, #T_51ee7_row1_col6, #T_51ee7_row1_col7, #T_51ee7_row1_col8, #T_51ee7_row2_col0, #T_51ee7_row2_col1, #T_51ee7_row2_col2, #T_51ee7_row2_col3, #T_51ee7_row2_col4, #T_51ee7_row2_col5, #T_51ee7_row2_col6, #T_51ee7_row2_col7, #T_51ee7_row2_col8, #T_51ee7_row3_col0, #T_51ee7_row3_col1, #T_51ee7_row3_col2, #T_51ee7_row3_col3, #T_51ee7_row3_col4, #T_51ee7_row3_col5, #T_51ee7_row3_col6, #T_51ee7_row3_col7, #T_51ee7_row3_col8, #T_51ee7_row4_col0, #T_51ee7_row4_col1, #T_51ee7_row4_col2, #T_51ee7_row4_col3, #T_51ee7_row4_col4, #T_51ee7_row4_col5, #T_51ee7_row4_col6, #T_51ee7_row4_col7, #T_51ee7_row4_col8, #T_51ee7_row5_col0, #T_51ee7_row5_col1, #T_51ee7_row5_col2, #T_51ee7_row5_col3, #T_51ee7_row5_col4, #T_51ee7_row5_col5, #T_51ee7_row5_col6, #T_51ee7_row5_col7, #T_51ee7_row5_col8, #T_51ee7_row6_col0, #T_51ee7_row6_col1, #T_51ee7_row6_col2, #T_51ee7_row6_col3, #T_51ee7_row6_col4, #T_51ee7_row6_col5, #T_51ee7_row6_col6, #T_51ee7_row6_col7, #T_51ee7_row6_col8, #T_51ee7_row7_col0, #T_51ee7_row7_col1, #T_51ee7_row7_col2, #T_51ee7_row7_col3, #T_51ee7_row7_col4, #T_51ee7_row7_col5, #T_51ee7_row7_col6, #T_51ee7_row7_col7, #T_51ee7_row7_col8, #T_51ee7_row8_col0, #T_51ee7_row8_col1, #T_51ee7_row8_col2, #T_51ee7_row8_col3, #T_51ee7_row8_col4, #T_51ee7_row8_col5, #T_51ee7_row8_col6, #T_51ee7_row8_col7, #T_51ee7_row8_col8, #T_51ee7_row9_col0, #T_51ee7_row9_col1, #T_51ee7_row9_col2, #T_51ee7_row9_col3, #T_51ee7_row9_col4, #T_51ee7_row9_col5, #T_51ee7_row9_col6, #T_51ee7_row9_col7, #T_51ee7_row9_col8, #T_51ee7_row10_col0, #T_51ee7_row10_col1, #T_51ee7_row10_col2, #T_51ee7_row10_col3, #T_51ee7_row10_col4, #T_51ee7_row10_col5, #T_51ee7_row10_col6, #T_51ee7_row10_col7, #T_51ee7_row10_col8, #T_51ee7_row11_col0, #T_51ee7_row11_col1, #T_51ee7_row11_col2, #T_51ee7_row11_col3, #T_51ee7_row11_col4, #T_51ee7_row11_col5, #T_51ee7_row11_col6, #T_51ee7_row11_col7, #T_51ee7_row11_col8 {
+#T_7032d_row0_col0, #T_7032d_row0_col1, #T_7032d_row0_col2, #T_7032d_row0_col3, #T_7032d_row0_col4, #T_7032d_row0_col5, #T_7032d_row0_col6, #T_7032d_row0_col7, #T_7032d_row0_col8, #T_7032d_row1_col0, #T_7032d_row1_col1, #T_7032d_row1_col2, #T_7032d_row1_col3, #T_7032d_row1_col4, #T_7032d_row1_col5, #T_7032d_row1_col6, #T_7032d_row1_col7, #T_7032d_row1_col8, #T_7032d_row2_col0, #T_7032d_row2_col1, #T_7032d_row2_col2, #T_7032d_row2_col3, #T_7032d_row2_col4, #T_7032d_row2_col5, #T_7032d_row2_col6, #T_7032d_row2_col7, #T_7032d_row2_col8, #T_7032d_row3_col0, #T_7032d_row3_col1, #T_7032d_row3_col2, #T_7032d_row3_col3, #T_7032d_row3_col4, #T_7032d_row3_col5, #T_7032d_row3_col6, #T_7032d_row3_col7, #T_7032d_row3_col8, #T_7032d_row4_col0, #T_7032d_row4_col1, #T_7032d_row4_col2, #T_7032d_row4_col3, #T_7032d_row4_col4, #T_7032d_row4_col5, #T_7032d_row4_col6, #T_7032d_row4_col7, #T_7032d_row4_col8, #T_7032d_row5_col0, #T_7032d_row5_col1, #T_7032d_row5_col2, #T_7032d_row5_col3, #T_7032d_row5_col4, #T_7032d_row5_col5, #T_7032d_row5_col6, #T_7032d_row5_col7, #T_7032d_row5_col8, #T_7032d_row6_col0, #T_7032d_row6_col1, #T_7032d_row6_col2, #T_7032d_row6_col3, #T_7032d_row6_col4, #T_7032d_row6_col5, #T_7032d_row6_col6, #T_7032d_row6_col7, #T_7032d_row6_col8, #T_7032d_row7_col0, #T_7032d_row7_col1, #T_7032d_row7_col2, #T_7032d_row7_col3, #T_7032d_row7_col4, #T_7032d_row7_col5, #T_7032d_row7_col6, #T_7032d_row7_col7, #T_7032d_row7_col8, #T_7032d_row8_col0, #T_7032d_row8_col1, #T_7032d_row8_col2, #T_7032d_row8_col3, #T_7032d_row8_col4, #T_7032d_row8_col5, #T_7032d_row8_col6, #T_7032d_row8_col7, #T_7032d_row8_col8, #T_7032d_row9_col0, #T_7032d_row9_col1, #T_7032d_row9_col2, #T_7032d_row9_col3, #T_7032d_row9_col4, #T_7032d_row9_col5, #T_7032d_row9_col6, #T_7032d_row9_col7, #T_7032d_row9_col8, #T_7032d_row10_col0, #T_7032d_row10_col1, #T_7032d_row10_col2, #T_7032d_row10_col3, #T_7032d_row10_col4, #T_7032d_row10_col5, #T_7032d_row10_col6, #T_7032d_row10_col7, #T_7032d_row10_col8, #T_7032d_row11_col0, #T_7032d_row11_col1, #T_7032d_row11_col2, #T_7032d_row11_col3, #T_7032d_row11_col4, #T_7032d_row11_col5, #T_7032d_row11_col6, #T_7032d_row11_col7, #T_7032d_row11_col8 {
   font-size: 11.5px;
 }
 </style>
-<table id="T_51ee7">
+<table id="T_7032d">
 <thead>
 <tr>
 <th class="blank level0"> </th>
-<th class="col_heading level0 col0" id="T_51ee7_level0_col0">Autorités et diplomatie</th>
-<th class="col_heading level0 col1" id="T_51ee7_level0_col1">Œcuménisme et dialogue</th>
-<th class="col_heading level0 col2" id="T_51ee7_level0_col2">Évêques</th>
-<th class="col_heading level0 col3" id="T_51ee7_level0_col3">Clergé et religieux</th>
-<th class="col_heading level0 col4" id="T_51ee7_level0_col4">Jeunes et éducation</th>
-<th class="col_heading level0 col5" id="T_51ee7_level0_col5">Pauvres, malades, migrants</th>
-<th class="col_heading level0 col6" id="T_51ee7_level0_col6">Prière, mémoire, réconciliation</th>
-<th class="col_heading level0 col7" id="T_51ee7_level0_col7">Accueil et départ</th>
-<th class="col_heading level0 col8" id="T_51ee7_level0_col8">Autres rencontres</th>
+<th class="col_heading level0 col0" id="T_7032d_level0_col0">Autorités et diplomatie</th>
+<th class="col_heading level0 col1" id="T_7032d_level0_col1">Œcuménisme et dialogue</th>
+<th class="col_heading level0 col2" id="T_7032d_level0_col2">Évêques</th>
+<th class="col_heading level0 col3" id="T_7032d_level0_col3">Clergé et religieux</th>
+<th class="col_heading level0 col4" id="T_7032d_level0_col4">Jeunes et éducation</th>
+<th class="col_heading level0 col5" id="T_7032d_level0_col5">Pauvres, malades, migrants</th>
+<th class="col_heading level0 col6" id="T_7032d_level0_col6">Prière, mémoire, réconciliation</th>
+<th class="col_heading level0 col7" id="T_7032d_level0_col7">Accueil et départ</th>
+<th class="col_heading level0 col8" id="T_7032d_level0_col8">Autres rencontres</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<th class="row_heading level0 row0" id="T_51ee7_level0_row0">0</th>
-<td class="data row0 col0" id="T_51ee7_row0_col0">europe (13.8)</td>
-<td class="data row0 col1" id="T_51ee7_row0_col1">unity (12.5)</td>
-<td class="data row0 col2" id="T_51ee7_row0_col2">church (21.1)</td>
-<td class="data row0 col3" id="T_51ee7_row0_col3">consecrated (14.7)</td>
-<td class="data row0 col4" id="T_51ee7_row0_col4">young (24.3)</td>
-<td class="data row0 col5" id="T_51ee7_row0_col5">migrants (8.7)</td>
-<td class="data row0 col6" id="T_51ee7_row0_col6">mercy (11.0)</td>
-<td class="data row0 col7" id="T_51ee7_row0_col7">president (9.4)</td>
-<td class="data row0 col8" id="T_51ee7_row0_col8">mediterranean (12.4)</td>
+<th class="row_heading level0 row0" id="T_7032d_level0_row0">0</th>
+<td class="data row0 col0" id="T_7032d_row0_col0">europe (13.8)</td>
+<td class="data row0 col1" id="T_7032d_row0_col1">unity (12.5)</td>
+<td class="data row0 col2" id="T_7032d_row0_col2">church (21.1)</td>
+<td class="data row0 col3" id="T_7032d_row0_col3">consecrated (14.7)</td>
+<td class="data row0 col4" id="T_7032d_row0_col4">young (24.3)</td>
+<td class="data row0 col5" id="T_7032d_row0_col5">migrants (8.7)</td>
+<td class="data row0 col6" id="T_7032d_row0_col6">mercy (11.0)</td>
+<td class="data row0 col7" id="T_7032d_row0_col7">president (9.4)</td>
+<td class="data row0 col8" id="T_7032d_row0_col8">mediterranean (12.4)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row1" id="T_51ee7_level0_row1">1</th>
-<td class="data row1 col0" id="T_51ee7_row1_col0">human (13.1)</td>
-<td class="data row1 col1" id="T_51ee7_row1_col1">christians (12.4)</td>
-<td class="data row1 col2" id="T_51ee7_row1_col2">priests (15.8)</td>
-<td class="data row1 col3" id="T_51ee7_row1_col3">lord (11.4)</td>
-<td class="data row1 col4" id="T_51ee7_row1_col4">jesus (18.2)</td>
-<td class="data row1 col5" id="T_51ee7_row1_col5">peoples (8.6)</td>
-<td class="data row1 col6" id="T_51ee7_row1_col6">nuclear (8.5)</td>
-<td class="data row1 col7" id="T_51ee7_row1_col7">days (7.9)</td>
-<td class="data row1 col8" id="T_51ee7_row1_col8">volunteers (9.5)</td>
+<th class="row_heading level0 row1" id="T_7032d_level0_row1">1</th>
+<td class="data row1 col0" id="T_7032d_row1_col0">human (13.1)</td>
+<td class="data row1 col1" id="T_7032d_row1_col1">christians (12.4)</td>
+<td class="data row1 col2" id="T_7032d_row1_col2">priests (15.8)</td>
+<td class="data row1 col3" id="T_7032d_row1_col3">lord (11.4)</td>
+<td class="data row1 col4" id="T_7032d_row1_col4">jesus (18.2)</td>
+<td class="data row1 col5" id="T_7032d_row1_col5">peoples (8.6)</td>
+<td class="data row1 col6" id="T_7032d_row1_col6">nuclear (8.5)</td>
+<td class="data row1 col7" id="T_7032d_row1_col7">days (7.9)</td>
+<td class="data row1 col8" id="T_7032d_row1_col8">volunteers (9.5)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row2" id="T_51ee7_level0_row2">2</th>
-<td class="data row2 col0" id="T_51ee7_row2_col0">president (12.8)</td>
-<td class="data row2 col1" id="T_51ee7_row2_col1">communion (11.4)</td>
-<td class="data row2 col2" id="T_51ee7_row2_col2">pastoral (14.3)</td>
-<td class="data row2 col3" id="T_51ee7_row2_col3">jesus (10.8)</td>
-<td class="data row2 col4" id="T_51ee7_row2_col4">cross (11.4)</td>
-<td class="data row2 col5" id="T_51ee7_row2_col5">pain (8.3)</td>
-<td class="data row2 col6" id="T_51ee7_row2_col6">lady (8.5)</td>
-<td class="data row2 col7" id="T_51ee7_row2_col7">cuba (7.5)</td>
-<td class="data row2 col8" id="T_51ee7_row2_col8">sea (9.5)</td>
+<th class="row_heading level0 row2" id="T_7032d_level0_row2">2</th>
+<td class="data row2 col0" id="T_7032d_row2_col0">president (12.8)</td>
+<td class="data row2 col1" id="T_7032d_row2_col1">communion (11.4)</td>
+<td class="data row2 col2" id="T_7032d_row2_col2">pastoral (14.3)</td>
+<td class="data row2 col3" id="T_7032d_row2_col3">jesus (10.8)</td>
+<td class="data row2 col4" id="T_7032d_row2_col4">cross (11.4)</td>
+<td class="data row2 col5" id="T_7032d_row2_col5">pain (8.3)</td>
+<td class="data row2 col6" id="T_7032d_row2_col6">lady (8.5)</td>
+<td class="data row2 col7" id="T_7032d_row2_col7">cuba (7.5)</td>
+<td class="data row2 col8" id="T_7032d_row2_col8">sea (9.5)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row3" id="T_51ee7_level0_row3">3</th>
-<td class="data row3 col0" id="T_51ee7_row3_col0">social (12.8)</td>
-<td class="data row3 col1" id="T_51ee7_row3_col1">holiness (9.5)</td>
-<td class="data row3 col2" id="T_51ee7_row3_col2">gospel (13.0)</td>
-<td class="data row3 col3" id="T_51ee7_row3_col3">joy (9.8)</td>
-<td class="data row3 col4" id="T_51ee7_row3_col4">university (11.1)</td>
-<td class="data row3 col5" id="T_51ee7_row3_col5">dignity (7.0)</td>
-<td class="data row3 col6" id="T_51ee7_row3_col6">weapons (8.1)</td>
-<td class="data row3 col7" id="T_51ee7_row3_col7">sri (7.0)</td>
-<td class="data row3 col8" id="T_51ee7_row3_col8">marseille (8.0)</td>
+<th class="row_heading level0 row3" id="T_7032d_level0_row3">3</th>
+<td class="data row3 col0" id="T_7032d_row3_col0">social (12.8)</td>
+<td class="data row3 col1" id="T_7032d_row3_col1">holiness (9.5)</td>
+<td class="data row3 col2" id="T_7032d_row3_col2">gospel (13.0)</td>
+<td class="data row3 col3" id="T_7032d_row3_col3">joy (9.8)</td>
+<td class="data row3 col4" id="T_7032d_row3_col4">university (11.1)</td>
+<td class="data row3 col5" id="T_7032d_row3_col5">dignity (7.0)</td>
+<td class="data row3 col6" id="T_7032d_row3_col6">weapons (8.1)</td>
+<td class="data row3 col7" id="T_7032d_row3_col7">sri (7.0)</td>
+<td class="data row3 col8" id="T_7032d_row3_col8">marseille (8.0)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row4" id="T_51ee7_level0_row4">4</th>
-<td class="data row4 col0" id="T_51ee7_row4_col0">development (12.5)</td>
-<td class="data row4 col1" id="T_51ee7_row4_col1">peace (9.4)</td>
-<td class="data row4 col2" id="T_51ee7_row4_col2">bishops (12.5)</td>
-<td class="data row4 col3" id="T_51ee7_row4_col3">priests (9.2)</td>
-<td class="data row4 col4" id="T_51ee7_row4_col4">love (10.4)</td>
-<td class="data row4 col5" id="T_51ee7_row4_col5">change (6.8)</td>
-<td class="data row4 col6" id="T_51ee7_row4_col6">mary (7.7)</td>
-<td class="data row4 col7" id="T_51ee7_row4_col7">cuban (6.5)</td>
-<td class="data row4 col8" id="T_51ee7_row4_col8">mess (7.2)</td>
+<th class="row_heading level0 row4" id="T_7032d_level0_row4">4</th>
+<td class="data row4 col0" id="T_7032d_row4_col0">development (12.5)</td>
+<td class="data row4 col1" id="T_7032d_row4_col1">peace (9.4)</td>
+<td class="data row4 col2" id="T_7032d_row4_col2">bishops (12.5)</td>
+<td class="data row4 col3" id="T_7032d_row4_col3">priests (9.2)</td>
+<td class="data row4 col4" id="T_7032d_row4_col4">love (10.4)</td>
+<td class="data row4 col5" id="T_7032d_row4_col5">change (6.8)</td>
+<td class="data row4 col6" id="T_7032d_row4_col6">mary (7.7)</td>
+<td class="data row4 col7" id="T_7032d_row4_col7">cuban (6.5)</td>
+<td class="data row4 col8" id="T_7032d_row4_col8">mess (7.2)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row5" id="T_51ee7_level0_row5">5</th>
-<td class="data row5 col0" id="T_51ee7_row5_col0">society (12.1)</td>
-<td class="data row5 col1" id="T_51ee7_row5_col1">ecumenical (9.2)</td>
-<td class="data row5 col2" id="T_51ee7_row5_col2">bishop (12.1)</td>
-<td class="data row5 col3" id="T_51ee7_row5_col3">god (8.5)</td>
-<td class="data row5 col4" id="T_51ee7_row5_col4">ask (10.3)</td>
-<td class="data row5 col5" id="T_51ee7_row5_col5">children (6.7)</td>
-<td class="data row5 col6" id="T_51ee7_row5_col6">victims (7.7)</td>
-<td class="data row5 col7" id="T_51ee7_row5_col7">bolivia (6.4)</td>
-<td class="data row5 col8" id="T_51ee7_row5_col8">port (6.9)</td>
+<th class="row_heading level0 row5" id="T_7032d_level0_row5">5</th>
+<td class="data row5 col0" id="T_7032d_row5_col0">society (12.1)</td>
+<td class="data row5 col1" id="T_7032d_row5_col1">ecumenical (9.2)</td>
+<td class="data row5 col2" id="T_7032d_row5_col2">bishop (12.1)</td>
+<td class="data row5 col3" id="T_7032d_row5_col3">god (8.5)</td>
+<td class="data row5 col4" id="T_7032d_row5_col4">ask (10.3)</td>
+<td class="data row5 col5" id="T_7032d_row5_col5">children (6.7)</td>
+<td class="data row5 col6" id="T_7032d_row5_col6">victims (7.7)</td>
+<td class="data row5 col7" id="T_7032d_row5_col7">bolivia (6.4)</td>
+<td class="data row5 col8" id="T_7032d_row5_col8">port (6.9)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row6" id="T_51ee7_level0_row6">6</th>
-<td class="data row6 col0" id="T_51ee7_row6_col0">political (11.6)</td>
-<td class="data row6 col1" id="T_51ee7_row6_col1">orthodox (9.0)</td>
-<td class="data row6 col2" id="T_51ee7_row6_col2">mission (11.5)</td>
-<td class="data row6 col3" id="T_51ee7_row6_col3">seminarians (8.4)</td>
-<td class="data row6 col4" id="T_51ee7_row6_col4">answer (10.0)</td>
-<td class="data row6 col5" id="T_51ee7_row6_col5">native (6.6)</td>
-<td class="data row6 col6" id="T_51ee7_row6_col6">love (7.6)</td>
-<td class="data row6 col7" id="T_51ee7_row6_col7">lanka (6.3)</td>
-<td class="data row6 col8" id="T_51ee7_row6_col8">bolivia (6.7)</td>
+<th class="row_heading level0 row6" id="T_7032d_level0_row6">6</th>
+<td class="data row6 col0" id="T_7032d_row6_col0">political (11.6)</td>
+<td class="data row6 col1" id="T_7032d_row6_col1">orthodox (9.0)</td>
+<td class="data row6 col2" id="T_7032d_row6_col2">mission (11.5)</td>
+<td class="data row6 col3" id="T_7032d_row6_col3">seminarians (8.4)</td>
+<td class="data row6 col4" id="T_7032d_row6_col4">answer (10.0)</td>
+<td class="data row6 col5" id="T_7032d_row6_col5">native (6.6)</td>
+<td class="data row6 col6" id="T_7032d_row6_col6">love (7.6)</td>
+<td class="data row6 col7" id="T_7032d_row6_col7">lanka (6.3)</td>
+<td class="data row6 col8" id="T_7032d_row6_col8">bolivia (6.7)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row7" id="T_51ee7_level0_row7">7</th>
-<td class="data row7 col0" id="T_51ee7_row7_col0">common (11.2)</td>
-<td class="data row7 col1" id="T_51ee7_row7_col1">churches (8.8)</td>
-<td class="data row7 col2" id="T_51ee7_row7_col2">closeness (10.7)</td>
-<td class="data row7 col3" id="T_51ee7_row7_col3">forget (7.6)</td>
-<td class="data row7 col4" id="T_51ee7_row7_col4">life (10.0)</td>
-<td class="data row7 col5" id="T_51ee7_row7_col5">charity (6.3)</td>
-<td class="data row7 col6" id="T_51ee7_row7_col6">sri (6.9)</td>
-<td class="data row7 col7" id="T_51ee7_row7_col7">brazil (6.3)</td>
-<td class="data row7 col8" id="T_51ee7_row7_col8">days (6.2)</td>
+<th class="row_heading level0 row7" id="T_7032d_level0_row7">7</th>
+<td class="data row7 col0" id="T_7032d_row7_col0">common (11.2)</td>
+<td class="data row7 col1" id="T_7032d_row7_col1">churches (8.8)</td>
+<td class="data row7 col2" id="T_7032d_row7_col2">closeness (10.7)</td>
+<td class="data row7 col3" id="T_7032d_row7_col3">forget (7.6)</td>
+<td class="data row7 col4" id="T_7032d_row7_col4">life (10.0)</td>
+<td class="data row7 col5" id="T_7032d_row7_col5">charity (6.3)</td>
+<td class="data row7 col6" id="T_7032d_row7_col6">sri (6.9)</td>
+<td class="data row7 col7" id="T_7032d_row7_col7">brazil (6.3)</td>
+<td class="data row7 col8" id="T_7032d_row7_col8">days (6.2)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row8" id="T_51ee7_level0_row8">8</th>
-<td class="data row8 col0" id="T_51ee7_row8_col0">civil (11.1)</td>
-<td class="data row8 col1" id="T_51ee7_row8_col1">abraham (8.7)</td>
-<td class="data row8 col2" id="T_51ee7_row8_col2">missionary (10.1)</td>
-<td class="data row8 col3" id="T_51ee7_row8_col3">remembrance (7.6)</td>
-<td class="data row8 col4" id="T_51ee7_row8_col4">question (9.5)</td>
-<td class="data row8 col5" id="T_51ee7_row8_col5">economy (6.2)</td>
-<td class="data row8 col6" id="T_51ee7_row8_col6">marriage (6.9)</td>
-<td class="data row8 col7" id="T_51ee7_row8_col7">visit (6.2)</td>
-<td class="data row8 col8" id="T_51ee7_row8_col8">forwards (6.1)</td>
+<th class="row_heading level0 row8" id="T_7032d_level0_row8">8</th>
+<td class="data row8 col0" id="T_7032d_row8_col0">civil (11.1)</td>
+<td class="data row8 col1" id="T_7032d_row8_col1">abraham (8.7)</td>
+<td class="data row8 col2" id="T_7032d_row8_col2">missionary (10.1)</td>
+<td class="data row8 col3" id="T_7032d_row8_col3">remembrance (7.6)</td>
+<td class="data row8 col4" id="T_7032d_row8_col4">question (9.5)</td>
+<td class="data row8 col5" id="T_7032d_row8_col5">economy (6.2)</td>
+<td class="data row8 col6" id="T_7032d_row8_col6">marriage (6.9)</td>
+<td class="data row8 col7" id="T_7032d_row8_col7">visit (6.2)</td>
+<td class="data row8 col8" id="T_7032d_row8_col8">forwards (6.1)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row9" id="T_51ee7_level0_row9">9</th>
-<td class="data row9 col0" id="T_51ee7_row9_col0">country (10.7)</td>
-<td class="data row9 col1" id="T_51ee7_row9_col1">religions (8.5)</td>
-<td class="data row9 col2" id="T_51ee7_row9_col2">ministry (9.7)</td>
-<td class="data row9 col3" id="T_51ee7_row9_col3">peter (7.5)</td>
-<td class="data row9 col4" id="T_51ee7_row9_col4">youth (8.5)</td>
-<td class="data row9 col5" id="T_51ee7_row9_col5">poor (6.1)</td>
-<td class="data row9 col6" id="T_51ee7_row9_col6">mother (5.8)</td>
-<td class="data row9 col7" id="T_51ee7_row9_col7">land (6.1)</td>
-<td class="data row9 col8" id="T_51ee7_row9_col8">elizabeth (5.8)</td>
+<th class="row_heading level0 row9" id="T_7032d_level0_row9">9</th>
+<td class="data row9 col0" id="T_7032d_row9_col0">country (10.7)</td>
+<td class="data row9 col1" id="T_7032d_row9_col1">religions (8.5)</td>
+<td class="data row9 col2" id="T_7032d_row9_col2">ministry (9.7)</td>
+<td class="data row9 col3" id="T_7032d_row9_col3">peter (7.5)</td>
+<td class="data row9 col4" id="T_7032d_row9_col4">youth (8.5)</td>
+<td class="data row9 col5" id="T_7032d_row9_col5">poor (6.1)</td>
+<td class="data row9 col6" id="T_7032d_row9_col6">mother (5.8)</td>
+<td class="data row9 col7" id="T_7032d_row9_col7">land (6.1)</td>
+<td class="data row9 col8" id="T_7032d_row9_col8">elizabeth (5.8)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row10" id="T_51ee7_level0_row10">10</th>
-<td class="data row10 col0" id="T_51ee7_row10_col0">rights (10.7)</td>
-<td class="data row10 col1" id="T_51ee7_row10_col1">dialogue (8.5)</td>
-<td class="data row10 col2" id="T_51ee7_row10_col2">pastors (9.7)</td>
-<td class="data row10 col3" id="T_51ee7_row10_col3">witnesses (7.4)</td>
-<td class="data row10 col4" id="T_51ee7_row10_col4">going (8.5)</td>
-<td class="data row10 col5" id="T_51ee7_row10_col5">faces (6.0)</td>
-<td class="data row10 col6" id="T_51ee7_row10_col6">saint (5.8)</td>
-<td class="data row10 col7" id="T_51ee7_row10_col7">israel (5.9)</td>
-<td class="data row10 col8" id="T_51ee7_row10_col8">wrote (5.7)</td>
+<th class="row_heading level0 row10" id="T_7032d_level0_row10">10</th>
+<td class="data row10 col0" id="T_7032d_row10_col0">rights (10.7)</td>
+<td class="data row10 col1" id="T_7032d_row10_col1">dialogue (8.5)</td>
+<td class="data row10 col2" id="T_7032d_row10_col2">pastors (9.7)</td>
+<td class="data row10 col3" id="T_7032d_row10_col3">witnesses (7.4)</td>
+<td class="data row10 col4" id="T_7032d_row10_col4">going (8.5)</td>
+<td class="data row10 col5" id="T_7032d_row10_col5">faces (6.0)</td>
+<td class="data row10 col6" id="T_7032d_row10_col6">saint (5.8)</td>
+<td class="data row10 col7" id="T_7032d_row10_col7">israel (5.9)</td>
+<td class="data row10 col8" id="T_7032d_row10_col8">wrote (5.7)</td>
 </tr>
 <tr>
-<th class="row_heading level0 row11" id="T_51ee7_level0_row11">11</th>
-<td class="data row11 col0" id="T_51ee7_row11_col0">economic (10.5)</td>
-<td class="data row11 col1" id="T_51ee7_row11_col1">journey (8.2)</td>
-<td class="data row11 col2" id="T_51ee7_row11_col2">shepherd (9.6)</td>
-<td class="data row11 col3" id="T_51ee7_row11_col3">serve (7.4)</td>
-<td class="data row11 col4" id="T_51ee7_row11_col4">feel (8.5)</td>
-<td class="data row11 col5" id="T_51ee7_row11_col5">samaritan (5.9)</td>
-<td class="data row11 col6" id="T_51ee7_row11_col6">everyday (5.7)</td>
-<td class="data row11 col7" id="T_51ee7_row11_col7">miss (5.9)</td>
-<td class="data row11 col8" id="T_51ee7_row11_col8">generosity (5.7)</td>
+<th class="row_heading level0 row11" id="T_7032d_level0_row11">11</th>
+<td class="data row11 col0" id="T_7032d_row11_col0">economic (10.5)</td>
+<td class="data row11 col1" id="T_7032d_row11_col1">journey (8.2)</td>
+<td class="data row11 col2" id="T_7032d_row11_col2">shepherd (9.6)</td>
+<td class="data row11 col3" id="T_7032d_row11_col3">serve (7.4)</td>
+<td class="data row11 col4" id="T_7032d_row11_col4">feel (8.5)</td>
+<td class="data row11 col5" id="T_7032d_row11_col5">samaritan (5.9)</td>
+<td class="data row11 col6" id="T_7032d_row11_col6">everyday (5.7)</td>
+<td class="data row11 col7" id="T_7032d_row11_col7">miss (5.9)</td>
+<td class="data row11 col8" id="T_7032d_row11_col8">generosity (5.7)</td>
 </tr>
 </tbody>
 </table>

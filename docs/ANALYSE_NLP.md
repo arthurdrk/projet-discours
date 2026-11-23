@@ -10,7 +10,7 @@ Le corpus contient les discours en anglais des voyages apostoliques hors
 d'Italie (2013–2024 ; le voyage à Dubaï de 2023, annulé, est écarté). Un discours
 est retenu si sa date tombe pendant un voyage et si son en-tête mentionne le
 voyage. Les conférences de presse et échanges avec les journalistes sont écartés
-(voir `preparer_corpus.py`). Les homélies ne sont pas incluses.
+(voir `acquisition/preparer_corpus.py`). Les homélies ne sont pas incluses.
 
 ## Distinguer les lieux
 

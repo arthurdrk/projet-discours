@@ -13,21 +13,24 @@ Source : https://www.vatican.va. Méthode en deux étapes :
 
 Ce script ne fait que collecter. Le tri (discours prononcés au Vatican le jour du
 départ, conférences de presse dans l'avion) et le nettoyage des textes sont faits
-ensuite par preparer_corpus.py.
+ensuite par acquisition/preparer_corpus.py.
 
 Résultat : data/discours_bruts.parquet, une ligne par discours avec le HTML du texte,
 copié sur le S3 du SSPCloud. Durée : environ 10 minutes (une pause entre deux pages).
 """
 import re
+import sys
 import time
 from datetime import date
 from functools import lru_cache
+from pathlib import Path
 from urllib.parse import urljoin
 
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # racine du projet, pour importer outils/
 from outils.stockage import enregistrer
 
 SITE = "https://www.vatican.va/content/francesco/en"
@@ -137,7 +140,7 @@ def main():
         bruts[colonne] = bruts[colonne].astype(str)
     print(f"{len(bruts)} discours téléchargés.")
     enregistrer(bruts, "discours_bruts.parquet")
-    print("Étape suivante : python preparer_corpus.py")
+    print("Étape suivante : python acquisition/preparer_corpus.py")
 
 
 if __name__ == "__main__":

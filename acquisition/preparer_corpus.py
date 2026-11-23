@@ -15,10 +15,13 @@ Entrée : discours_bruts.parquet (data/ ou S3), produit par telecharger_discours
 Sortie : discours.parquet, dans data/ et sur le S3.
 """
 import re
+import sys
+from pathlib import Path
 
 import pandas as pd
 from bs4 import BeautifulSoup
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # racine du projet, pour importer outils/
 from outils.stockage import enregistrer, lire
 
 # Mois et jours en anglais, et en italien : certains en-têtes du site gardent la date italienne.

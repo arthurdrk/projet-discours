@@ -11,7 +11,7 @@ import pandas as pd
 
 from stockage import lire  # data/discours.parquet, ou sa copie publique sur le S3
 
-ROOT = next((p for p in [Path.cwd(), *Path.cwd().parents] if (p / "telecharger_discours.py").exists()),
+ROOT = next((p for p in [Path.cwd(), *Path.cwd().parents] if (p / "outils" / "analyse_corpus.py").exists()),
             Path(__file__).resolve().parents[1])
 RESULTATS = ROOT / "resultats"
 
@@ -388,7 +388,7 @@ def nom_voyage(titre):
 
 
 def charger():
-    """Discours préparés par preparer_corpus.py, enrichis des variables d'analyse."""
+    """Discours préparés par acquisition/preparer_corpus.py, enrichis des variables d'analyse."""
     df = lire("discours.parquet")
     if df["source_url"].duplicated().any():
         raise ValueError("Discours en double : examiner le corpus avant l'analyse.")

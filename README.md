@@ -44,11 +44,11 @@ python -m pip install -r requirements.txt
 À la racine du projet, avec l'environnement Python activé :
 
 ```powershell
-python telecharger_discours.py   # environ 10 minutes -> data/discours_bruts.parquet
-python preparer_corpus.py        # quelques secondes  -> data/discours.parquet
+python acquisition/telecharger_discours.py   # environ 10 minutes -> data/discours_bruts.parquet
+python acquisition/preparer_corpus.py        # quelques secondes  -> data/discours.parquet
 ```
 
-**Collecte** (`telecharger_discours.py`). La page de chaque année sur vatican.va
+**Collecte** (`acquisition/telecharger_discours.py`). La page de chaque année sur vatican.va
 liste les voyages hors d'Italie ; le titre d'un voyage donne ses dates, par exemple
 « (30 September - 2 October 2016) ». L'index mensuel des discours (rubrique
 *speeches*) donne la date de chaque discours dans son adresse : on garde ceux
@@ -56,7 +56,7 @@ prononcés pendant un voyage. Les pages des voyages ne suffisent pas, car après
 elles ne renvoient plus directement vers les textes. Le voyage à Dubaï (COP28,
 décembre 2023) est écarté : il a été annulé et les discours lus par un autre.
 
-**Préparation** (`preparer_corpus.py`). Chaque texte est découpé en un en-tête
+**Préparation** (`acquisition/preparer_corpus.py`). Chaque texte est découpé en un en-tête
 (paragraphes centrés : voyage, public, lieu, date) et un corps ; le lieu est lu dans
 l'en-tête. Deux cas sont écartés (le script affiche combien) :
 
@@ -88,8 +88,9 @@ $env:AWS_SESSION_TOKEN = "..."
 
 | Fichier ou dossier | Rôle |
 | --- | --- |
-| `telecharger_discours.py` | Collecter les discours des voyages sur vatican.va |
-| `preparer_corpus.py` | Séparer en-têtes et textes, lire les lieux, écarter les textes hors périmètre |
+| `acquisition/telecharger_discours.py` | Collecter les discours des voyages sur vatican.va |
+| `acquisition/preparer_corpus.py` | Séparer en-têtes et textes, lire les lieux, écarter les textes hors périmètre |
+| `acquisition/scraping_no_speeches.py`, `cleaning_no_speeches.py` | Travail d'Adrien en cours : table des voyages de trois papes, lieux et pays (pas encore utilisé par les notebooks) |
 | `outils/stockage.py` | Lire et écrire les données (dossier `data/` et S3 du SSPCloud) |
 | `outils/analyse_corpus.py` | Fonctions communes aux notebooks |
 | `notebooks/` | Analyser le corpus |

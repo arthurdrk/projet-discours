@@ -55,7 +55,7 @@ def lire(nom):
     except Exception as erreur:
         raise FileNotFoundError(
             f"{nom} est absent de data/ et du S3 ({adresse_publique(nom)}). "
-            "Lancer python telecharger_discours.py puis python preparer_corpus.py."
+            "Lancer python acquisition/telecharger_discours.py puis python acquisition/preparer_corpus.py."
         ) from erreur
 
 

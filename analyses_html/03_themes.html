@@ -7808,7 +7808,7 @@ pondérés ; chaque discours reçoit une <strong>part</strong> de chaque thème 
 représentatifs avant de les nommer. Les parts ne sont pas des probabilités. La section « Stabilité » vérifie que les
 thèmes ne dépendent pas du hasard. Les noms de pays et de villes peuvent former des thèmes « géographiques » :
 <code>MASQUER_LIEUX = True</code> les retire pour se concentrer sur le fond.</p>
-<p>Les conférences de presse en vol (questions de journalistes) sont exclues du corpus (<code>preparer_corpus.py</code>).</p>
+<p>Les conférences de presse en vol (questions de journalistes) sont exclues du corpus (<code>acquisition/preparer_corpus.py</code>).</p>
 </div>
 </div>
 </div>
@@ -7822,7 +7822,7 @@ thèmes ne dépendent pas du hasard. Les noms de pays et de villes peuvent forme
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="n">ROOT</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s2">"telecharger_discours.py"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span>
+<span class="n">ROOT</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s2">"outils"</span> <span class="o">/</span> <span class="s2">"analyse_corpus.py"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s2">"outils"</span><span class="p">))</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -7928,116 +7928,116 @@ thèmes ne dépendent pas du hasard. Les noms de pays et de villes peuvent forme
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <style type="text/css">
-#T_f018c_row0_col2 {
+#T_586eb_row0_col2 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 100.0%, transparent 100.0%);
 }
-#T_f018c_row1_col2 {
+#T_586eb_row1_col2 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 84.8%, transparent 84.8%);
 }
-#T_f018c_row2_col2 {
+#T_586eb_row2_col2 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 92.6%, transparent 92.6%);
 }
-#T_f018c_row3_col2 {
+#T_586eb_row3_col2 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 58.3%, transparent 58.3%);
 }
-#T_f018c_row4_col2 {
+#T_586eb_row4_col2 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 52.2%, transparent 52.2%);
 }
-#T_f018c_row5_col2 {
+#T_586eb_row5_col2 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 62.5%, transparent 62.5%);
 }
-#T_f018c_row6_col2 {
+#T_586eb_row6_col2 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 63.0%, transparent 63.0%);
 }
-#T_f018c_row7_col2 {
+#T_586eb_row7_col2 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 88.5%, transparent 88.5%);
 }
-#T_f018c_row8_col2 {
+#T_586eb_row8_col2 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 30.8%, transparent 30.8%);
 }
-#T_f018c_row9_col2 {
+#T_586eb_row9_col2 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 34.9%, transparent 34.9%);
 }
 </style>
-<table id="T_f018c">
+<table id="T_586eb">
 <thead>
 <tr>
-<th class="col_heading level0 col0" id="T_f018c_level0_col0">thème</th>
-<th class="col_heading level0 col1" id="T_f018c_level0_col1">termes principaux</th>
-<th class="col_heading level0 col2" id="T_f018c_level0_col2">part moyenne</th>
-<th class="col_heading level0 col3" id="T_f018c_level0_col3">discours où il domine</th>
+<th class="col_heading level0 col0" id="T_586eb_level0_col0">thème</th>
+<th class="col_heading level0 col1" id="T_586eb_level0_col1">termes principaux</th>
+<th class="col_heading level0 col2" id="T_586eb_level0_col2">part moyenne</th>
+<th class="col_heading level0 col3" id="T_586eb_level0_col3">discours où il domine</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="data row0 col0" id="T_f018c_row0_col0">T01 young people · dream · afraid</td>
-<td class="data row0 col1" id="T_f018c_row0_col1">young people, dream, afraid, dreams, beautiful, answer, youth, young person, going, asked, told, repeat</td>
-<td class="data row0 col2" id="T_f018c_row0_col2">15.0%</td>
-<td class="data row0 col3" id="T_f018c_row0_col3">48</td>
+<td class="data row0 col0" id="T_586eb_row0_col0">T01 young people · dream · afraid</td>
+<td class="data row0 col1" id="T_586eb_row0_col1">young people, dream, afraid, dreams, beautiful, answer, youth, young person, going, asked, told, repeat</td>
+<td class="data row0 col2" id="T_586eb_row0_col2">15.0%</td>
+<td class="data row0 col3" id="T_586eb_row0_col3">48</td>
 </tr>
 <tr>
-<td class="data row1 col0" id="T_f018c_row1_col0">T02 president · nation · diplomatic</td>
-<td class="data row1 col1" id="T_f018c_row1_col1">president, nation, diplomatic, corps, diplomatic corps, authorities, government, development, members, distinguished, visit, common good</td>
-<td class="data row1 col2" id="T_f018c_row1_col2">12.7%</td>
-<td class="data row1 col3" id="T_f018c_row1_col3">48</td>
+<td class="data row1 col0" id="T_586eb_row1_col0">T02 president · nation · diplomatic</td>
+<td class="data row1 col1" id="T_586eb_row1_col1">president, nation, diplomatic, corps, diplomatic corps, authorities, government, development, members, distinguished, visit, common good</td>
+<td class="data row1 col2" id="T_586eb_row1_col2">12.7%</td>
+<td class="data row1 col3" id="T_586eb_row1_col3">48</td>
 </tr>
 <tr>
-<td class="data row2 col0" id="T_f018c_row2_col0">T03 priests · consecrated · mission</td>
-<td class="data row2 col1" id="T_f018c_row2_col1">priests, consecrated, mission, pastoral, ministry, missionary, bishops, faithful, priest, bishop, seminarians, people god</td>
-<td class="data row2 col2" id="T_f018c_row2_col2">13.9%</td>
-<td class="data row2 col3" id="T_f018c_row2_col3">61</td>
+<td class="data row2 col0" id="T_586eb_row2_col0">T03 priests · consecrated · mission</td>
+<td class="data row2 col1" id="T_586eb_row2_col1">priests, consecrated, mission, pastoral, ministry, missionary, bishops, faithful, priest, bishop, seminarians, people god</td>
+<td class="data row2 col2" id="T_586eb_row2_col2">13.9%</td>
+<td class="data row2 col3" id="T_586eb_row2_col3">61</td>
 </tr>
 <tr>
-<td class="data row3 col0" id="T_f018c_row3_col0">T04 unity · communion · holiness</td>
-<td class="data row3 col1" id="T_f018c_row3_col1">unity, communion, holiness, apostles, orthodox, christians, saint, paul, rome, ecumenism, journey, saints</td>
-<td class="data row3 col2" id="T_f018c_row3_col2">8.7%</td>
-<td class="data row3 col3" id="T_f018c_row3_col3">27</td>
+<td class="data row3 col0" id="T_586eb_row3_col0">T04 unity · communion · holiness</td>
+<td class="data row3 col1" id="T_586eb_row3_col1">unity, communion, holiness, apostles, orthodox, christians, saint, paul, rome, ecumenism, journey, saints</td>
+<td class="data row3 col2" id="T_586eb_row3_col2">8.7%</td>
+<td class="data row3 col3" id="T_586eb_row3_col3">27</td>
 </tr>
 <tr>
-<td class="data row4 col0" id="T_f018c_row4_col0">T05 blessing · bless · mary</td>
-<td class="data row4 col1" id="T_f018c_row4_col1">blessing, bless, mary, lady, care, son, cared, virgin, mother, son spirit, god bless, hail mary</td>
-<td class="data row4 col2" id="T_f018c_row4_col2">7.8%</td>
-<td class="data row4 col3" id="T_f018c_row4_col3">30</td>
+<td class="data row4 col0" id="T_586eb_row4_col0">T05 blessing · bless · mary</td>
+<td class="data row4 col1" id="T_586eb_row4_col1">blessing, bless, mary, lady, care, son, cared, virgin, mother, son spirit, god bless, hail mary</td>
+<td class="data row4 col2" id="T_586eb_row4_col2">7.8%</td>
+<td class="data row4 col3" id="T_586eb_row4_col3">30</td>
 </tr>
 <tr>
-<td class="data row5 col0" id="T_f018c_row5_col0">T06 cross · mercy · pain</td>
-<td class="data row5 col1" id="T_f018c_row5_col1">cross, mercy, pain, death, evil, suffering, sin, victims, hatred, forgiveness, reconciliation, violence</td>
-<td class="data row5 col2" id="T_f018c_row5_col2">9.4%</td>
-<td class="data row5 col3" id="T_f018c_row5_col3">26</td>
+<td class="data row5 col0" id="T_586eb_row5_col0">T06 cross · mercy · pain</td>
+<td class="data row5 col1" id="T_586eb_row5_col1">cross, mercy, pain, death, evil, suffering, sin, victims, hatred, forgiveness, reconciliation, violence</td>
+<td class="data row5 col2" id="T_586eb_row5_col2">9.4%</td>
+<td class="data row5 col3" id="T_586eb_row5_col3">26</td>
 </tr>
 <tr>
-<td class="data row6 col0" id="T_f018c_row6_col0">T07 religions · dialogue · interreligious</td>
-<td class="data row6 col1" id="T_f018c_row6_col1">religions, dialogue, interreligious, respect, religion, communities, mutual, leaders, interreligious dialogue, traditions, violence, fraternity</td>
-<td class="data row6 col2" id="T_f018c_row6_col2">9.4%</td>
-<td class="data row6 col3" id="T_f018c_row6_col3">26</td>
+<td class="data row6 col0" id="T_586eb_row6_col0">T07 religions · dialogue · interreligious</td>
+<td class="data row6 col1" id="T_586eb_row6_col1">religions, dialogue, interreligious, respect, religion, communities, mutual, leaders, interreligious dialogue, traditions, violence, fraternity</td>
+<td class="data row6 col2" id="T_586eb_row6_col2">9.4%</td>
+<td class="data row6 col3" id="T_586eb_row6_col3">26</td>
 </tr>
 <tr>
-<td class="data row7 col0" id="T_f018c_row7_col0">T08 culture · social · university</td>
-<td class="data row7 col1" id="T_f018c_row7_col1">culture, social, university, forms, peoples, creation, capable, laudato, environment, interests, earth, sense</td>
-<td class="data row7 col2" id="T_f018c_row7_col2">13.3%</td>
-<td class="data row7 col3" id="T_f018c_row7_col3">47</td>
+<td class="data row7 col0" id="T_586eb_row7_col0">T08 culture · social · university</td>
+<td class="data row7 col1" id="T_586eb_row7_col1">culture, social, university, forms, peoples, creation, capable, laudato, environment, interests, earth, sense</td>
+<td class="data row7 col2" id="T_586eb_row7_col2">13.3%</td>
+<td class="data row7 col3" id="T_586eb_row7_col3">47</td>
 </tr>
 <tr>
-<td class="data row8 col0" id="T_f018c_row8_col0">T09 married · marriage · wife</td>
-<td class="data row8 col1" id="T_f018c_row8_col1">married, marriage, wife, families, couples, husband, parents, sorry, married life, spouses, grandparents, family life</td>
-<td class="data row8 col2" id="T_f018c_row8_col2">4.6%</td>
-<td class="data row8 col3" id="T_f018c_row8_col3">8</td>
+<td class="data row8 col0" id="T_586eb_row8_col0">T09 married · marriage · wife</td>
+<td class="data row8 col1" id="T_586eb_row8_col1">married, marriage, wife, families, couples, husband, parents, sorry, married life, spouses, grandparents, family life</td>
+<td class="data row8 col2" id="T_586eb_row8_col2">4.6%</td>
+<td class="data row8 col3" id="T_586eb_row8_col3">8</td>
 </tr>
 <tr>
-<td class="data row9 col0" id="T_f018c_row9_col0">T10 refugees · humanitarian · forced</td>
-<td class="data row9 col1" id="T_f018c_row9_col1">refugees, humanitarian, forced, migrants, situation, middle, ieronymos, international, mediterranean, sea, war, bartholomew</td>
-<td class="data row9 col2" id="T_f018c_row9_col2">5.2%</td>
-<td class="data row9 col3" id="T_f018c_row9_col3">13</td>
+<td class="data row9 col0" id="T_586eb_row9_col0">T10 refugees · humanitarian · forced</td>
+<td class="data row9 col1" id="T_586eb_row9_col1">refugees, humanitarian, forced, migrants, situation, middle, ieronymos, international, mediterranean, sea, war, bartholomew</td>
+<td class="data row9 col2" id="T_586eb_row9_col2">5.2%</td>
+<td class="data row9 col3" id="T_586eb_row9_col3">13</td>
 </tr>
 </tbody>
 </table>
@@ -8374,127 +8374,127 @@ comptent que 2 à 6 voyages : une variation peut refléter les pays visités plu
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-OutputArea-output" data-mime-type="text/html" tabindex="0">
 <style type="text/css">
-#T_3a5be_row0_col4 {
+#T_af725_row0_col4 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 100.0%, transparent 100.0%);
 }
-#T_3a5be_row1_col4 {
+#T_af725_row1_col4 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 90.3%, transparent 90.3%);
 }
-#T_3a5be_row2_col4 {
+#T_af725_row2_col4 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 84.1%, transparent 84.1%);
 }
-#T_3a5be_row3_col4 {
+#T_af725_row3_col4 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 83.7%, transparent 83.7%);
 }
-#T_3a5be_row4_col4 {
+#T_af725_row4_col4 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 77.9%, transparent 77.9%);
 }
-#T_3a5be_row5_col4 {
+#T_af725_row5_col4 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 76.2%, transparent 76.2%);
 }
-#T_3a5be_row6_col4 {
+#T_af725_row6_col4 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 73.0%, transparent 73.0%);
 }
-#T_3a5be_row7_col4 {
+#T_af725_row7_col4 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 72.6%, transparent 72.6%);
 }
-#T_3a5be_row8_col4 {
+#T_af725_row8_col4 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 71.7%, transparent 71.7%);
 }
-#T_3a5be_row9_col4 {
+#T_af725_row9_col4 {
   width: 10em;
   background: linear-gradient(90deg, #b7d3f6 71.1%, transparent 71.1%);
 }
 </style>
-<table id="T_3a5be">
+<table id="T_af725">
 <thead>
 <tr>
-<th class="col_heading level0 col0" id="T_3a5be_level0_col0">date</th>
-<th class="col_heading level0 col1" id="T_3a5be_level0_col1">pays</th>
-<th class="col_heading level0 col2" id="T_3a5be_level0_col2">public</th>
-<th class="col_heading level0 col3" id="T_3a5be_level0_col3">titre</th>
-<th class="col_heading level0 col4" id="T_3a5be_level0_col4">similarité</th>
+<th class="col_heading level0 col0" id="T_af725_level0_col0">date</th>
+<th class="col_heading level0 col1" id="T_af725_level0_col1">pays</th>
+<th class="col_heading level0 col2" id="T_af725_level0_col2">public</th>
+<th class="col_heading level0 col3" id="T_af725_level0_col3">titre</th>
+<th class="col_heading level0 col4" id="T_af725_level0_col4">similarité</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td class="data row0 col0" id="T_3a5be_row0_col0">21/11/2019</td>
-<td class="data row0 col1" id="T_3a5be_row0_col1">Thaïlande</td>
-<td class="data row0 col2" id="T_3a5be_row0_col2">Autorités et diplomatie</td>
-<td class="data row0 col3" id="T_3a5be_row0_col3">Apostolic Journey to Thailand: Meeting with Authorities, Civil Society and the Diplomatic Corps in the "Inner Santi Maitri" Hall of the Government House (Bangkok, 21 November 2019)</td>
-<td class="data row0 col4" id="T_3a5be_row0_col4">0.13</td>
+<td class="data row0 col0" id="T_af725_row0_col0">21/11/2019</td>
+<td class="data row0 col1" id="T_af725_row0_col1">Thaïlande</td>
+<td class="data row0 col2" id="T_af725_row0_col2">Autorités et diplomatie</td>
+<td class="data row0 col3" id="T_af725_row0_col3">Apostolic Journey to Thailand: Meeting with Authorities, Civil Society and the Diplomatic Corps in the "Inner Santi Maitri" Hall of the Government House (Bangkok, 21 November 2019)</td>
+<td class="data row0 col4" id="T_af725_row0_col4">0.13</td>
 </tr>
 <tr>
-<td class="data row1 col0" id="T_3a5be_row1_col0">29/11/2015</td>
-<td class="data row1 col1" id="T_3a5be_row1_col1">Centrafrique</td>
-<td class="data row1 col2" id="T_3a5be_row1_col2">Autorités et diplomatie</td>
-<td class="data row1 col3" id="T_3a5be_row1_col3">Apostolic Journey - Central African Republic: Meeting with Authorities and the Diplomatic Corps (Bangui, 29 November 2015)</td>
-<td class="data row1 col4" id="T_3a5be_row1_col4">0.11</td>
+<td class="data row1 col0" id="T_af725_row1_col0">29/11/2015</td>
+<td class="data row1 col1" id="T_af725_row1_col1">Centrafrique</td>
+<td class="data row1 col2" id="T_af725_row1_col2">Autorités et diplomatie</td>
+<td class="data row1 col3" id="T_af725_row1_col3">Apostolic Journey - Central African Republic: Meeting with Authorities and the Diplomatic Corps (Bangui, 29 November 2015)</td>
+<td class="data row1 col4" id="T_af725_row1_col4">0.11</td>
 </tr>
 <tr>
-<td class="data row2 col0" id="T_3a5be_row2_col0">25/11/2019</td>
-<td class="data row2 col1" id="T_3a5be_row2_col1">Japon</td>
-<td class="data row2 col2" id="T_3a5be_row2_col2">Autorités et diplomatie</td>
-<td class="data row2 col3" id="T_3a5be_row2_col3">Apostolic Journey to Japan: Meeting with Authorities and the Diplomatic Corps at Kantei (25 November 2019)</td>
-<td class="data row2 col4" id="T_3a5be_row2_col4">0.11</td>
+<td class="data row2 col0" id="T_af725_row2_col0">25/11/2019</td>
+<td class="data row2 col1" id="T_af725_row2_col1">Japon</td>
+<td class="data row2 col2" id="T_af725_row2_col2">Autorités et diplomatie</td>
+<td class="data row2 col3" id="T_af725_row2_col3">Apostolic Journey to Japan: Meeting with Authorities and the Diplomatic Corps at Kantei (25 November 2019)</td>
+<td class="data row2 col4" id="T_af725_row2_col4">0.11</td>
 </tr>
 <tr>
-<td class="data row3 col0" id="T_3a5be_row3_col0">27/11/2015</td>
-<td class="data row3 col1" id="T_3a5be_row3_col1">Ouganda</td>
-<td class="data row3 col2" id="T_3a5be_row3_col2">Autorités et diplomatie</td>
-<td class="data row3 col3" id="T_3a5be_row3_col3">Apostolic Journey - Uganda: Meeting with Authorities and the Diplomatic Corps gathered in the Conference Hall of the State House (Entebbe, 27 November 2015)</td>
-<td class="data row3 col4" id="T_3a5be_row3_col4">0.11</td>
+<td class="data row3 col0" id="T_af725_row3_col0">27/11/2015</td>
+<td class="data row3 col1" id="T_af725_row3_col1">Ouganda</td>
+<td class="data row3 col2" id="T_af725_row3_col2">Autorités et diplomatie</td>
+<td class="data row3 col3" id="T_af725_row3_col3">Apostolic Journey - Uganda: Meeting with Authorities and the Diplomatic Corps gathered in the Conference Hall of the State House (Entebbe, 27 November 2015)</td>
+<td class="data row3 col4" id="T_af725_row3_col4">0.11</td>
 </tr>
 <tr>
-<td class="data row4 col0" id="T_3a5be_row4_col0">10/07/2015</td>
-<td class="data row4 col1" id="T_3a5be_row4_col1">Paraguay</td>
-<td class="data row4 col2" id="T_3a5be_row4_col2">Autorités et diplomatie</td>
-<td class="data row4 col3" id="T_3a5be_row4_col3">Apostolic Journey - Paraguay: Meeting with government authorities and the diplomatic corps in the gardens of Lopez Palace (Asunción, 10 July 2015)</td>
-<td class="data row4 col4" id="T_3a5be_row4_col4">0.10</td>
+<td class="data row4 col0" id="T_af725_row4_col0">10/07/2015</td>
+<td class="data row4 col1" id="T_af725_row4_col1">Paraguay</td>
+<td class="data row4 col2" id="T_af725_row4_col2">Autorités et diplomatie</td>
+<td class="data row4 col3" id="T_af725_row4_col3">Apostolic Journey - Paraguay: Meeting with government authorities and the diplomatic corps in the gardens of Lopez Palace (Asunción, 10 July 2015)</td>
+<td class="data row4 col4" id="T_af725_row4_col4">0.10</td>
 </tr>
 <tr>
-<td class="data row5 col0" id="T_3a5be_row5_col0">14/08/2014</td>
-<td class="data row5 col1" id="T_3a5be_row5_col1">Corée du Sud</td>
-<td class="data row5 col2" id="T_3a5be_row5_col2">Autorités et diplomatie</td>
-<td class="data row5 col3" id="T_3a5be_row5_col3">Meeting with the Authorities in the Chungmu Hall at the "Blue House" in Seoul (14 August 2014)</td>
-<td class="data row5 col4" id="T_3a5be_row5_col4">0.10</td>
+<td class="data row5 col0" id="T_af725_row5_col0">14/08/2014</td>
+<td class="data row5 col1" id="T_af725_row5_col1">Corée du Sud</td>
+<td class="data row5 col2" id="T_af725_row5_col2">Autorités et diplomatie</td>
+<td class="data row5 col3" id="T_af725_row5_col3">Meeting with the Authorities in the Chungmu Hall at the "Blue House" in Seoul (14 August 2014)</td>
+<td class="data row5 col4" id="T_af725_row5_col4">0.10</td>
 </tr>
 <tr>
-<td class="data row6 col0" id="T_3a5be_row6_col0">25/09/2015</td>
-<td class="data row6 col1" id="T_3a5be_row6_col1">États-Unis</td>
-<td class="data row6 col2" id="T_3a5be_row6_col2">Autorités et diplomatie</td>
-<td class="data row6 col3" id="T_3a5be_row6_col3">Apostolic Journey - United Nations: Meeting with the members of the General Assembly of the United Nations Organization (New York, 25 September 2015)</td>
-<td class="data row6 col4" id="T_3a5be_row6_col4">0.09</td>
+<td class="data row6 col0" id="T_af725_row6_col0">25/09/2015</td>
+<td class="data row6 col1" id="T_af725_row6_col1">États-Unis</td>
+<td class="data row6 col2" id="T_af725_row6_col2">Autorités et diplomatie</td>
+<td class="data row6 col3" id="T_af725_row6_col3">Apostolic Journey - United Nations: Meeting with the members of the General Assembly of the United Nations Organization (New York, 25 September 2015)</td>
+<td class="data row6 col4" id="T_af725_row6_col4">0.09</td>
 </tr>
 <tr>
-<td class="data row7 col0" id="T_3a5be_row7_col0">26/11/2015</td>
-<td class="data row7 col1" id="T_3a5be_row7_col1">Kenya</td>
-<td class="data row7 col2" id="T_3a5be_row7_col2">Autorités et diplomatie</td>
-<td class="data row7 col3" id="T_3a5be_row7_col3">Apostolic Journey - Kenya: Visit to the U.N.O.N. (United Nations Office at Nairobi) (26 November 2015)</td>
-<td class="data row7 col4" id="T_3a5be_row7_col4">0.09</td>
+<td class="data row7 col0" id="T_af725_row7_col0">26/11/2015</td>
+<td class="data row7 col1" id="T_af725_row7_col1">Kenya</td>
+<td class="data row7 col2" id="T_af725_row7_col2">Autorités et diplomatie</td>
+<td class="data row7 col3" id="T_af725_row7_col3">Apostolic Journey - Kenya: Visit to the U.N.O.N. (United Nations Office at Nairobi) (26 November 2015)</td>
+<td class="data row7 col4" id="T_af725_row7_col4">0.09</td>
 </tr>
 <tr>
-<td class="data row8 col0" id="T_3a5be_row8_col0">09/07/2015</td>
-<td class="data row8 col1" id="T_3a5be_row8_col1">Bolivie</td>
-<td class="data row8 col2" id="T_3a5be_row8_col2">Pauvres, malades, migrants</td>
-<td class="data row8 col3" id="T_3a5be_row8_col3">Apostolic Journey - Bolivia: Participation at the Second World Meeting of Popular Movements at the Expo Feria Exhibition Centre (Santa Cruz de la Sierra, 9 July 2015)</td>
-<td class="data row8 col4" id="T_3a5be_row8_col4">0.09</td>
+<td class="data row8 col0" id="T_af725_row8_col0">09/07/2015</td>
+<td class="data row8 col1" id="T_af725_row8_col1">Bolivie</td>
+<td class="data row8 col2" id="T_af725_row8_col2">Pauvres, malades, migrants</td>
+<td class="data row8 col3" id="T_af725_row8_col3">Apostolic Journey - Bolivia: Participation at the Second World Meeting of Popular Movements at the Expo Feria Exhibition Centre (Santa Cruz de la Sierra, 9 July 2015)</td>
+<td class="data row8 col4" id="T_af725_row8_col4">0.09</td>
 </tr>
 <tr>
-<td class="data row9 col0" id="T_3a5be_row9_col0">30/11/2017</td>
-<td class="data row9 col1" id="T_3a5be_row9_col1">Bangladesh</td>
-<td class="data row9 col2" id="T_3a5be_row9_col2">Autorités et diplomatie</td>
-<td class="data row9 col3" id="T_3a5be_row9_col3">Apostolic Journey to Bangladesh: Meeting with Government and Civil Authorities and the Diplomatic Corps in the President House (Dhaka, 30 November 2017)</td>
-<td class="data row9 col4" id="T_3a5be_row9_col4">0.09</td>
+<td class="data row9 col0" id="T_af725_row9_col0">30/11/2017</td>
+<td class="data row9 col1" id="T_af725_row9_col1">Bangladesh</td>
+<td class="data row9 col2" id="T_af725_row9_col2">Autorités et diplomatie</td>
+<td class="data row9 col3" id="T_af725_row9_col3">Apostolic Journey to Bangladesh: Meeting with Government and Civil Authorities and the Diplomatic Corps in the President House (Dhaka, 30 November 2017)</td>
+<td class="data row9 col4" id="T_af725_row9_col4">0.09</td>
 </tr>
 </tbody>
 </table>

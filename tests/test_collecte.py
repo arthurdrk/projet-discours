@@ -9,8 +9,8 @@ from unittest.mock import patch
 import pandas as pd
 from bs4 import BeautifulSoup
 
-import preparer_corpus
-import telecharger_discours as td
+from acquisition import preparer_corpus
+from acquisition import telecharger_discours as td
 
 SITE = "https://www.vatican.va/content/francesco/en"
 

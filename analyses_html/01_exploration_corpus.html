@@ -7804,7 +7804,7 @@ a.anchor-link {
 <h1 id="01-%E2%80%94-Panorama-:-les-discours-de-Fran%C3%A7ois-en-voyage">01 — Panorama : les discours de François en voyage<a class="anchor-link" href="#01-%E2%80%94-Panorama-:-les-discours-de-Fran%C3%A7ois-en-voyage">¶</a></h1><p><strong>Corpus.</strong> Les discours (rubrique <em>Speeches</em> de vatican.va) <strong>en anglais</strong> prononcés <strong>sur place</strong> pendant les
 voyages apostoliques <strong>hors d'Italie</strong> (2013-2024). Les discours du Vatican, de Rome et des visites en Italie sont
 exclus, ainsi que le voyage à Dubaï (COP28, 2023), annulé. Les homélies ne sont pas incluses.</p>
-<p><strong>Méthode de sélection</strong> (<code>telecharger_discours.py</code> puis <code>preparer_corpus.py</code>). Les dates de chaque voyage sont lues
+<p><strong>Méthode de sélection</strong> (<code>acquisition/telecharger_discours.py</code> puis <code>acquisition/preparer_corpus.py</code>). Les dates de chaque voyage sont lues
 dans son titre sur vatican.va ; on garde les discours de ces dates dont l'en-tête mentionne le voyage (« Apostolic
 Journey », « Pilgrimage »…). Les conférences de presse et échanges avec les journalistes, surtout dans l'avion, sont
 écartés : ils ne sont pas prononcés dans le pays et contiennent les questions des journalistes.</p>
@@ -7823,7 +7823,7 @@ d'un mot.</p>
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="n">ROOT</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s2">"telecharger_discours.py"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span>
+<span class="n">ROOT</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s2">"outils"</span> <span class="o">/</span> <span class="s2">"analyse_corpus.py"</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s2">"outils"</span><span class="p">))</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -8244,7 +8244,7 @@ pour vérifier le classement, notamment « Autres rencontres ».</p>
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="Contr%C3%B4le-qualit%C3%A9">Contrôle qualité<a class="anchor-link" href="#Contr%C3%B4le-qualit%C3%A9">¶</a></h2><p>À examiner avant d'interpréter : pays non attribué, lieu absent de l'en-tête, en-tête non détecté (il peut rester
 dans le corps), textes très courts. Les textes écartés à la préparation (conférences de presse, discours prononcés
-au Vatican) sont décrits dans <code>preparer_corpus.py</code>.</p>
+au Vatican) sont décrits dans <code>acquisition/preparer_corpus.py</code>.</p>
 </div>
 </div>
 </div>
