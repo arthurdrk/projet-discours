@@ -2,7 +2,7 @@
 
 Ce projet étudie les discours prononcés par le pape François pendant ses voyages hors d'Italie, de 2013 à 2024. La question est la suivante : adapte-t-il ce qu'il dit au pays et au public qu'il rencontre ?
 
-Le rapport est le notebook `notebooks/rapport.ipynb`.
+Le rapport est le notebook `notebooks/rapport.ipynb`. Sa version web, avec des graphiques interactifs, est en ligne sur https://arthurdrk.github.io/projet-discours/.
 
 ## Lancer le rapport
 
@@ -12,6 +12,10 @@ jupyter lab notebooks/rapport.ipynb
 ```
 
 Le notebook charge les données préparées depuis le stockage du SSP Cloud, à l'adresse publique https://minio.lab.sspcloud.fr/arthurdk/diffusion/projet-discours/. Il n'est pas nécessaire de relancer la collecte.
+
+## Le site
+
+Le site est construit avec Quarto à partir du notebook, sans le réexécuter. Une GitHub Action le publie à chaque push sur `main` (`.github/workflows/site.yml`). Pour le voir en local : `quarto preview`.
 
 ## Refaire la collecte
 
@@ -31,6 +35,7 @@ Les fichiers sont écrits dans `data/`, puis copiés sur le SSP Cloud si les ide
 | Dossier | Contenu |
 | --- | --- |
 | `notebooks/` | Le rapport |
+| `index.qmd`, `_quarto.yml`, `site.css` | Le site web du rapport |
 | `acquisition/` | Collecte et préparation des discours. Les scripts `scraping_no_speeches.py` et `cleaning_no_speeches.py` construisent une table des voyages des trois derniers papes et ne servent pas au rapport. |
 | `outils/` | Fonctions communes : lecture et écriture des données, analyse, graphiques |
 | `tests/` | Tests de la collecte et de la préparation, sans accès au réseau |

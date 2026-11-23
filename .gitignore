@@ -22,3 +22,7 @@ resultats/
 tmp/
 output/
 notebooks/analyse_consommation_RTE.ipynb
+
+# --- Site Quarto (généré) ---
+_site/
+.quarto/

@@ -1,0 +1,32 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - notebooks/rapport.ipynb
+
+website:
+  title: "Les discours du pape François en voyage"
+  site-url: https://arthurdrk.github.io/projet-discours/
+  navbar:
+    left:
+      - href: index.qmd
+        text: Accueil
+      - href: notebooks/rapport.ipynb
+        text: Rapport
+    right:
+      - icon: github
+        href: https://github.com/arthurdrk/projet-discours
+        aria-label: Code sur GitHub
+  page-footer:
+    center: "Projet ENSAE 2026, données vatican.va"
+
+format:
+  html:
+    theme: cosmo
+    css: site.css
+    lang: fr
+    toc: true
+    toc-title: Sommaire
+    code-fold: true
+    code-summary: Voir le code

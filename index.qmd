@@ -1,0 +1,17 @@
+---
+title: "Les discours du pape François en voyage"
+subtitle: "Projet de Python pour la data science, ENSAE, 2026"
+toc: false
+---
+
+Entre 2013 et 2024, le pape François a fait 47 voyages hors d'Italie et y a prononcé 342 discours. Ce projet cherche à savoir s'il adapte ce qu'il dit au pays et au public qu'il rencontre.
+
+[Lire le rapport](notebooks/rapport.ipynb){.btn .btn-primary}
+
+## Le projet en bref
+
+- Les données : les discours en anglais publiés sur vatican.va, collectés automatiquement puis nettoyés.
+- La méthode : statistiques descriptives, comptage de thèmes à partir de listes de mots, mots caractéristiques de chaque continent.
+- Le code est sur [GitHub](https://github.com/arthurdrk/projet-discours). Les données préparées sont en accès libre sur le stockage du SSP Cloud.
+
+Auteurs : Arthur De Rouck, Adrien Vibert.
