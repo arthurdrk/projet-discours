@@ -3,18 +3,16 @@
 Chargement, pays et continent de chaque discours, type de public, pays mentionnés,
 lexiques thématiques, références, palette et style des graphiques.
 """
-import os
 import re
-import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
+from stockage import lire  # data/discours.parquet, ou sa copie publique sur le S3
+
 ROOT = next((p for p in [Path.cwd(), *Path.cwd().parents] if (p / "telecharger_discours.py").exists()),
             Path(__file__).resolve().parents[1])
-# La variable CORPUS_FRANCOIS permet de pointer vers un autre corpus préparé (tests).
-CORPUS = Path(os.environ.get("CORPUS_FRANCOIS", ROOT / "corpus_voyages_en" / "corpus_nlp.jsonl"))
 RESULTATS = ROOT / "resultats"
 
 # ---------------------------------------------------------------------------
@@ -32,11 +30,15 @@ COULEUR_CONTINENT = dict(zip(ORDRE_CONTINENTS, SERIES))
 def style():
     """Style matplotlib sobre : marques fines, grille discrète, encre neutre."""
     import matplotlib as mpl
+    from matplotlib import font_manager
     from matplotlib.colors import LinearSegmentedColormap
+    # Segoe UI n'existe que sous Windows : ailleurs (SSP Cloud, Linux), DejaVu Sans sans avertissement.
+    installees = {f.name for f in font_manager.fontManager.ttflist}
+    polices = [p for p in ("Segoe UI", "DejaVu Sans") if p in installees] + ["sans-serif"]
     mpl.rcParams.update({
         "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
         "figure.figsize": (11, 5), "figure.dpi": 110, "font.size": 10.5,
-        "font.family": ["Segoe UI", "DejaVu Sans", "sans-serif"],
+        "font.family": polices,
         "axes.edgecolor": AXE, "axes.labelcolor": ENCRE_2, "axes.titlecolor": ENCRE,
         "axes.titlesize": 13, "axes.titleweight": "semibold", "axes.titlelocation": "left",
         "axes.spines.top": False, "axes.spines.right": False,
@@ -386,11 +388,10 @@ def nom_voyage(titre):
 
 
 def charger():
-    if not CORPUS.exists():
-        sys.exit("Exécuter telecharger_discours.py puis preparer_corpus.py ; voir README.")
-    df = pd.read_json(CORPUS, lines=True, dtype={"date": str})
-    if df.duplicated(["event_id", "language"]).any():
-        raise ValueError("Doublons événement/langue : examiner le corpus avant l'analyse.")
+    """Discours préparés par preparer_corpus.py, enrichis des variables d'analyse."""
+    df = lire("discours.parquet")
+    if df["source_url"].duplicated().any():
+        raise ValueError("Discours en double : examiner le corpus avant l'analyse.")
     for col in ["text", "header", "venue_raw", "title", "travel_title"]:
         df[col] = df[col].fillna("") if col in df else ""
     df["date"] = pd.to_datetime(df["date"], errors="coerce")
