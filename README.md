@@ -36,7 +36,7 @@ Les fichiers sont écrits dans `data/`, puis copiés sur le SSP Cloud si les ide
 | --- | --- |
 | `notebooks/` | Le rapport |
 | `index.qmd`, `_quarto.yml`, `site.css` | Le site web du rapport |
-| `acquisition/` | Collecte et préparation des discours. Les scripts `scraping_no_speeches.py` et `cleaning_no_speeches.py` construisent une table des voyages des trois derniers papes et ne servent pas au rapport. |
+| `acquisition/` | Collecte et préparation des discours. Les scripts et notebooks d'Adrien (`scraping_no_speeches.py`, `cleaning_no_speeches.py`, `trips_religions.ipynb`...) construisent une table des voyages des trois derniers papes et la croisent avec des données sur les religions. Ils ne servent pas encore au rapport. |
 | `outils/` | Fonctions communes : lecture et écriture des données, analyse, graphiques |
 | `tests/` | Tests de la collecte et de la préparation, sans accès au réseau |
 | `docs/` | Notes de travail |
