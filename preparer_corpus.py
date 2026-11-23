@@ -1,92 +1,98 @@
-"""Préparation locale, conservatrice et auditable des HTML collectés."""
-import argparse
-import csv
-import json
-import re
-from pathlib import Path
-from urllib.parse import urljoin
+"""Nettoyer les discours téléchargés et produire la table analysée par les notebooks.
 
+Entrée : discours_bruts.parquet (data/ ou S3), produit par telecharger_discours.py.
+
+1. Découpage. Le texte d'un discours commence par un en-tête : quelques paragraphes
+   centrés (voyage, public, lieu, date). On le sépare du corps du discours, et on lit
+   le lieu dans l'en-tête (ce qui précède la date), pour attribuer ensuite un pays.
+2. Tri. On écarte (le nombre de textes écartés par raison est affiché) :
+   - les textes dont l'en-tête ne mentionne pas le voyage : discours prononcés au
+     Vatican le matin du départ, qui tombent dans les dates du voyage ;
+   - les conférences de presse et échanges avec les journalistes, surtout dans
+     l'avion : ils ne sont pas prononcés dans le pays visité, et le texte contient
+     les questions des journalistes.
+
+Sortie : discours.parquet, dans data/ et sur le S3.
+"""
+import re
+
+import pandas as pd
 from bs4 import BeautifulSoup
 
-MONTHS = (r'janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre|'
-          r'january|february|march|april|may|june|july|august|september|october|november|december')
-DATE = re.compile(rf'\b\d{{1,2}}(?:er|st|nd|rd|th)?\s+(?:{MONTHS})\s+\d{{4}}\b|\b(?:{MONTHS})\s+\d{{1,2}},?\s+\d{{4}}\b', re.I)
-DAY = re.compile(r'^(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche|'
-                 r'monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b', re.I)
-JOURNEY = re.compile(r'voyage apostolique|apostolic (?:journey|visit)|pilgrimage|pèlerinage', re.I)
+from outils.stockage import enregistrer, lire
+
+# Mois et jours en anglais, et en italien : certains en-têtes du site gardent la date italienne.
+MOIS = (r"january|february|march|april|may|june|july|august|september|october|november|december|"
+        r"gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre")
+DATE = re.compile(rf"\b\d{{1,2}}(?:st|nd|rd|th)?\s+(?:{MOIS})\s+\d{{4}}\b|\b(?:{MOIS})\s+\d{{1,2}},?\s+\d{{4}}\b", re.I)
+JOUR = re.compile(r"^(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday|"
+                  r"lunedì|martedì|mercoledì|giovedì|venerdì|sabato|domenica)\b", re.I)
+# Ligne d'en-tête qui annonce le voyage, sans donner le lieu du discours.
+LIGNE_VOYAGE = re.compile(r"apostolic (?:journey|visit)|pilgrimage", re.I)
+# Mention du voyage au début du texte (« Apostolic Journey », « JOUNEY » mal orthographié, « Visit to »...).
+MENTION_VOYAGE = re.compile(r"apostolic (?:jo\w*ney|visit)|pilgrimage|visit (?:of|to)", re.I)
+PRESSE = re.compile(r"flight|press conference|journalists|interview", re.I)
 
 
-def extract(html, url):
-    soup = BeautifulSoup(html, 'html.parser')
-    content = soup.select_one('.documento')
-    if content is None:
-        raise ValueError('Conteneur .documento absent')
-    for node in content.select('script, style, .translation-field, .container-utility'):
-        node.decompose()
-    paragraphs = [p for p in content.select('p') if not p.find('p')]
-    header, body, venue, evidence = [], [], '', ''
-    in_header = True
-    # Ne coupe que la séquence initiale de paragraphes explicitement centrés.
-    # En cas de mise en page inconnue, garde le texte et signale le statut.
-    for p in paragraphs:
-        text = p.get_text(' ', strip=True).replace('\xa0', ' ')
-        if not text or re.fullmatch(r'[\s*_\[\]]+', text):
+def est_centre(p):
+    """Paragraphe centré (attribut align ou style CSS) : c'est ainsi que sont mis en forme les en-têtes."""
+    return p.get("align", "").lower() == "center" or bool(re.search(r"text-align\s*:\s*center", p.get("style", ""), re.I))
+
+
+def lieu_avant_date(p):
+    """Lignes d'un paragraphe d'en-tête qui précèdent la date ou le jour : « Nairobi, Kenya »."""
+    lignes = [re.sub(r"\s+", " ", ligne).strip() for ligne in p.get_text("\n", strip=True).splitlines()]
+    avant = []
+    for ligne in lignes:
+        if DATE.search(ligne) or JOUR.search(ligne):
+            break
+        avant.append(ligne)
+    lieu = " ".join(avant).strip()
+    return lieu if len(lieu) < 200 else ""
+
+
+def decouper(html):
+    """En-tête, corps du texte et lieu d'un discours, à partir du HTML de son bloc de texte."""
+    contenu = BeautifulSoup(html, "html.parser")
+    for bloc in contenu.select("script, style, .translation-field, .container-utility"):
+        bloc.decompose()  # liens vers les traductions, boutons d'impression...
+    en_tete, corps, lieu = [], [], ""
+    dans_en_tete = True
+    for p in contenu.select("p"):
+        if p.find("p"):  # paragraphe qui en contient d'autres : on lira ceux de l'intérieur
             continue
-        centered = p.get('align', '').lower() == 'center' or bool(re.search(r'text-align\s*:\s*center', p.get('style', ''), re.I))
-        if in_header and centered:
-            header.append(text)
-            if DATE.search(text) and not JOURNEY.search(text):
-                lines = [re.sub(r'\s+', ' ', s).strip() for s in p.get_text('\n', strip=True).splitlines()]
-                before_date = []
-                for line in lines:
-                    if DATE.search(line) or DAY.search(line):
-                        break
-                    before_date.append(line)
-                candidate = ' '.join(before_date).strip()
-                if candidate and len(candidate) < 200:
-                    venue, evidence = candidate, text
+        texte = p.get_text(" ", strip=True).replace("\xa0", " ")
+        if not texte or re.fullmatch(r"[\s*_\[\]]+", texte):  # vide ou simple séparateur
             continue
-        in_header = False
-        if not text.startswith(('Copyright', '©')):
-            body.append(text)
-    links = sorted({urljoin(url, a['href']) for a in content.select('a[href]') if '/travels/' in a['href']})
-    return dict(text='\n\n'.join(body), header='\n'.join(header),
-                venue_raw=venue, venue_evidence=evidence,
-                venue_status='candidate_to_review' if venue else 'unknown',
-                cleaning_status='initial_centered_header_removed' if header else 'unsegmented',
-                travel_urls=links)
+        if dans_en_tete and est_centre(p):
+            en_tete.append(texte)
+            if DATE.search(texte) and not LIGNE_VOYAGE.search(texte):
+                lieu = lieu_avant_date(p) or lieu
+            continue
+        dans_en_tete = False  # le premier paragraphe non centré ouvre le corps du discours
+        if not texte.startswith(("Copyright", "©")):
+            corps.append(texte)
+    return "\n".join(en_tete), "\n\n".join(corps), lieu
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--corpus', type=Path, default=Path('corpus_voyages_en'))
-    args = parser.parse_args()
-    rows, errors = [], []
-    for path in sorted(args.corpus.glob('*/*/*/*.json')):
-        meta = json.loads(path.read_text(encoding='utf-8'))
-        try:
-            extracted = extract((args.corpus / meta['html_path']).read_bytes(), meta['source_url'])
-            rows.append(dict(meta, **extracted))
-        except Exception as exc:
-            errors.append(dict(metadata_path=str(path), error=str(exc)))
-    with (args.corpus / 'corpus_nlp.jsonl').open('w', encoding='utf-8') as f:
-        for row in rows:
-            f.write(json.dumps(row, ensure_ascii=False) + '\n')
-    fields = ['event_id', 'language', 'date', 'title', 'venue_raw', 'venue_status', 'venue_evidence', 'source_url']
-    # Export automatique distinct d'une éventuelle table d'annotations manuelles.
-    with (args.corpus / 'lieux_candidats.csv').open('w', encoding='utf-8-sig', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=fields, extrasaction='ignore')
-        writer.writeheader()
-        writer.writerows(rows)
-    report = dict(documents=len(rows), events=len({r['event_id'] for r in rows}),
-                  venue_candidates=sum(bool(r['venue_raw']) for r in rows),
-                  unknown_venues=sum(not r['venue_raw'] for r in rows),
-                  empty_bodies=sum(not r['text'].strip() for r in rows),
-                  errors=errors)
-    (args.corpus / 'qualite.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
-    print(json.dumps(report, ensure_ascii=False))
-    return 1 if errors or report['empty_bodies'] else 0
+    bruts = lire("discours_bruts.parquet")
+    print(f"{len(bruts)} discours bruts.")
+    df = bruts.drop(columns="html")
+    df["header"], df["text"], df["venue_raw"] = zip(*bruts["html"].map(decouper))
+    df["event_id"] = df["source_url"].str.extract(r"([^/]+)\.html$", expand=False)
+    df["cleaning_status"] = df["header"].ne("").map({True: "initial_centered_header_removed",
+                                                     False: "unsegmented"})
+
+    debut = (df["header"] + " " + df["text"]).str[:700]
+    df["raison_exclusion"] = ""
+    df.loc[~debut.str.contains(MENTION_VOYAGE), "raison_exclusion"] = "en-tête sans mention du voyage (Vatican)"
+    df.loc[df["title"].str.contains(PRESSE), "raison_exclusion"] = "conférence de presse ou journalistes"
+    garde = df["raison_exclusion"].eq("")
+
+    print(df.loc[~garde, "raison_exclusion"].value_counts().to_string())
+    enregistrer(df.loc[garde].drop(columns="raison_exclusion"), "discours.parquet")
 
 
-if __name__ == '__main__':
-    raise SystemExit(main())
+if __name__ == "__main__":
+    main()
