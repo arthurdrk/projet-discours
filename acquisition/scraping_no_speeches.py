@@ -3,7 +3,11 @@ import time
 
 import pandas as pd
 import requests
+import s3fs
 from bs4 import BeautifulSoup
+
+fs = s3fs.S3FileSystem(client_kwargs={"endpoint_url": "https://minio.lab.sspcloud.fr"})
+MY_BUCKET = "avibert"
 
 Domain = "https://www.vatican.va"
 URL_Base = "https://www.vatican.va/content/vatican/en/holy-father/{pope}.html"
@@ -63,3 +67,16 @@ def df_preparation(popes=POPES):
                 pre_df["Place"].append(trip)
     df = pd.DataFrame(pre_df)
     return df
+
+
+df_trips = df_preparation()
+
+print("done")
+
+FILE_PATH_OUT_S3_Parquet = f"{MY_BUCKET}/diffusion/df_trips.parquet"
+FILE_PATH_OUT_S3_normal = f"{MY_BUCKET}/diffusion/df_trips.csv"
+
+with fs.open(FILE_PATH_OUT_S3_Parquet, 'wb') as file_out:
+    df_trips.to_parquet(file_out)
+with fs.open(FILE_PATH_OUT_S3_normal, 'w') as file_out:
+    df_trips.to_csv(file_out)
