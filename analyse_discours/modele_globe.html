@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<!--
+  Modèle de la page du globe, rempli par globe.py (fonction creer_globe).
+  Les mots entre accolades ({figure}, {lieux}, {villes}...) sont remplacés par
+  les données calculées en Python. Ne pas ouvrir ce fichier directement :
+  ouvrir resultats/globe.html.
+
+  Plan du fichier : 1. styles (CSS)  2. mise en page (HTML)  3. comportement (JavaScript)
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atlas des voyages du pape François</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --encre: #141414; --rouge: #C8102E; --gris: #5E5E5E; --gris-fonce: #3A3A3A;
+    --filet: #D4D4D4; --jaune: #FFE97A;
+    --titre: "Archivo", "Arial Narrow", sans-serif;
+    --mono: "IBM Plex Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FFFFFF; color: var(--encre); font-family: var(--titre); }
+  .page { max-width: 1360px; margin: 0 auto; padding: 0 48px 40px; }
+  .mono { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+
+  /* En-tête */
+  .bandeau { border-bottom: 1px solid var(--encre); padding: 12px 0; color: var(--gris-fonce); }
+  header { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px;
+           padding: 28px 0 24px; border-bottom: 3px solid var(--encre); }
+  h1 { margin: 0; font-size: 76px; line-height: 0.92; font-weight: 800; font-stretch: 72%;
+       text-transform: uppercase; letter-spacing: -0.01em; }
+  .chapo { margin: 16px 0 0; max-width: 640px; font-size: 18px; line-height: 1.4; color: var(--gris-fonce); }
+  .boutons { display: flex; gap: 12px; flex-shrink: 0; }
+  .bouton { height: 46px; padding: 0 18px; display: inline-flex; align-items: center; gap: 10px;
+            border: 1.5px solid var(--encre); background: #FFFFFF; font-weight: 700; font-size: 15px; }
+  .bouton svg { width: 20px; height: 20px; }
+  .bouton.noir { background: var(--encre); color: #FFFFFF; }
+  .bouton:hover { box-shadow: inset 0 -4px var(--rouge); }
+
+  /* Chiffres clés */
+  .chiffres-cles { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--filet); }
+  .chiffre-cle { padding: 20px 24px; border-left: 1px solid var(--filet); }
+  .chiffre-cle:first-child { border-left: none; padding-left: 0; }
+  .chiffre-cle b { display: block; font-size: 60px; line-height: 1; font-weight: 800; font-stretch: 72%; }
+  .chiffre-cle span { color: var(--gris); }
+  .chiffre-cle.rouge b { color: var(--rouge); }
+
+  /* Barre de contrôle */
+  .controles { display: flex; align-items: center; flex-wrap: wrap; gap: 24px;
+               padding: 14px 0; border-bottom: 1px solid var(--filet); }
+  .groupe { display: flex; align-items: center; gap: 12px; }
+  .onglet { border: none; background: none; height: 40px; padding: 0 6px; font-weight: 700;
+            font-size: 15px; color: var(--gris); }
+  .onglet.actif { color: var(--encre); box-shadow: inset 0 -4px var(--rouge); }
+  select { height: 40px; border: 1.5px solid var(--encre); border-radius: 0; background: #FFFFFF;
+           font-family: var(--titre); font-size: 14px; font-weight: 600; padding: 0 10px; max-width: 340px; }
+  .case-a-cocher { margin-left: auto; display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; }
+  .case-a-cocher input { width: 18px; height: 18px; accent-color: var(--encre); }
+
+  /* Globe + fiche */
+  main { display: flex; gap: 0; padding-top: 24px; }
+  .colonne-globe { flex: 1 1 auto; min-width: 0; padding-right: 32px; }
+  #zone-globe { position: relative; height: 660px; overflow: hidden; }
+  #zone-globe > div:first-child { position: absolute; inset: 0; }
+  .zoom { position: absolute; top: 0; right: 0; display: flex; flex-direction: column; z-index: 2; }
+  .zoom button { width: 44px; height: 44px; border: 1.5px solid var(--encre); background: #FFFFFF;
+                 font-size: 22px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  .zoom button + button { border-top: none; }
+  .zoom button:hover { background: var(--encre); color: #FFFFFF; }
+  .zoom svg { width: 20px; height: 20px; }
+  .legendes { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 20px;
+              padding-top: 16px; border-top: 1px solid var(--filet); }
+  .legende-titre { display: block; margin-bottom: 8px; }
+  .paliers { display: flex; gap: 2px; }
+  .palier { display: flex; flex-direction: column; gap: 4px; min-width: 56px; padding-right: 6px;
+            color: var(--gris-fonce); white-space: nowrap; }
+  .palier i { display: block; width: calc(100% + 6px); height: 14px; }
+  .symboles { display: flex; gap: 18px; align-items: flex-end; color: var(--gris-fonce); }
+  .symboles span { display: inline-flex; align-items: center; gap: 6px; }
+  .s-rome { width: 10px; height: 10px; background: var(--encre); }
+  .s-capitale { width: 8px; height: 8px; border-radius: 50%; background: var(--encre); }
+  .s-ville { width: 6px; height: 6px; border-radius: 50%; border: 1.5px solid var(--encre); box-sizing: content-box; }
+  .s-trajet { width: 18px; height: 1.5px; background: var(--encre); }
+
+  aside { flex: 1 1 360px; max-width: 440px; border-left: 1px solid var(--encre); padding-left: 32px;
+          max-height: 760px; overflow-y: auto; }
+  .fiche-haut { padding-bottom: 20px; border-bottom: 3px solid var(--encre); }
+  .fiche-ligne { display: flex; justify-content: space-between; align-items: center; }
+  .etiquette { color: var(--rouge); font-weight: 600; }
+  .fermer { width: 44px; height: 44px; border: 1.5px solid var(--encre); background: #FFFFFF;
+            display: flex; align-items: center; justify-content: center; }
+  .fermer svg { width: 18px; height: 18px; }
+  .nom { margin: 8px 0 6px; font-size: 68px; line-height: 0.92; font-weight: 800; font-stretch: 72%;
+         text-transform: uppercase; overflow-wrap: anywhere; }
+  .sous-titre { margin: 0 0 16px; color: var(--gris-fonce); font-size: 16px; }
+  .badge { display: inline-flex; align-items: baseline; gap: 10px; background: var(--rouge);
+           color: #FFFFFF; padding: 8px 14px; }
+  .badge b { font-size: 44px; line-height: 1; font-weight: 800; font-stretch: 72%; }
+  .petits-chiffres { display: flex; gap: 24px; margin-top: 14px; color: var(--gris-fonce); }
+  .petits-chiffres b { font-family: var(--titre); font-size: 22px; font-weight: 800; color: var(--encre);
+                       margin-right: 4px; letter-spacing: 0; }
+  .ligne-lien { display: flex; align-items: center; gap: 14px; padding: 14px 0;
+                border-bottom: 1px solid var(--filet); cursor: pointer; }
+  .fiche-haut + .ligne-lien { border-top: none; }
+  .ligne-lien .mono { color: var(--gris); width: 64px; flex-shrink: 0; }
+  .ligne-lien .texte { flex: 1; font-weight: 700; font-size: 16px; }
+  .ligne-lien svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .ligne-lien:hover .texte { color: var(--rouge); }
+  .section { margin: 26px 0 12px; font-family: var(--mono); font-size: 12px; font-weight: 600;
+             text-transform: uppercase; letter-spacing: 0.04em; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag { background: var(--jaune); padding: 5px 10px; font-size: 14px; font-weight: 600; }
+  .tag small { font-family: var(--mono); font-weight: 500; margin-left: 4px; }
+  .tag.tag-ns { background: #FFFFFF; border: 1.5px dashed var(--gris); color: var(--gris-fonce); padding: 3.5px 8.5px; }
+  .verdict { border-left: 4px solid; padding: 4px 0 4px 14px; }
+  .verdict b { font-size: 18px; font-weight: 800; text-transform: uppercase; font-stretch: 80%; }
+  .verdict p { margin: 6px 0 0; font-size: 15px; line-height: 1.5; }
+  .effet { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: baseline;
+           padding: 9px 0; border-bottom: 1px solid var(--filet); }
+  .effet-nom { font-weight: 600; font-size: 15px; }
+  .effet-val { font-size: 22px; font-weight: 800; font-stretch: 72%; }
+  .effet-val.plus { color: var(--rouge); }
+  .effet-ic { color: var(--gris); font-family: var(--mono); font-size: 12px; }
+  .puce { border: 1.5px solid var(--encre); padding: 4px 9px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .puce.capitale { background: var(--encre); color: #FFFFFF; }
+  .puce:hover { box-shadow: inset 0 -3px var(--rouge); }
+  .puce small { font-family: var(--mono); font-weight: 500; margin-left: 4px; }
+  .lien { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 3px; cursor: pointer; }
+  .lien:hover { color: var(--rouge); }
+  .texte-courant { font-size: 16px; line-height: 1.5; margin: 18px 0 8px; }
+  .note { font-family: var(--mono); font-size: 12px; color: var(--gris); line-height: 1.5; }
+  .discours { list-style: none; margin: 0; padding: 0; }
+  .discours li { display: grid; grid-template-columns: 36px 1fr; gap: 8px; padding: 12px 0;
+                 border-bottom: 1px solid var(--filet); }
+  .discours .num { color: var(--rouge); font-size: 26px; line-height: 1; font-weight: 800; font-stretch: 72%; }
+  .discours a { color: var(--encre); font-weight: 700; font-size: 16px; line-height: 1.3; text-decoration: none; }
+  .discours a:hover { color: var(--rouge); }
+  .discours .meta { margin-top: 4px; color: var(--gris); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  td { padding: 5px 4px; border-bottom: 1px solid var(--filet); vertical-align: middle; }
+  td.chiffre { font-family: var(--mono); text-align: right; }
+  .barre-fond { background: #ECEAE4; width: 100px; height: 8px; position: relative; }
+  .barre-val { height: 8px; position: absolute; left: 0; top: 0; background: var(--encre); }
+  .barre-val.plus { background: var(--rouge); }
+  .barre-val.ns { background: #BDBDBD; }
+  #legendeNote { margin: 8px 0 0; max-width: 460px; }
+
+  footer { margin-top: 32px; padding-top: 14px; border-top: 3px solid var(--encre); color: var(--gris); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="bandeau mono">Projet statistique — Pontificat de François, 2013–2025</div>
+
+  <header>
+    <div>
+      <h1>Où le pape François<br>a-t-il parlé ?</h1>
+      <p class="chapo">Chaque voyage apostolique part de Rome. La carte compte les discours prononcés
+        dans chaque pays et relève les thèmes abordés, ville par ville.</p>
+    </div>
+    <div class="boutons">
+      <button class="bouton" id="boutonAvion">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 13l8-1 5-8h2l-2 8 6 1v2l-6 1 2 8h-2l-5-8-8-1z"/></svg>
+        Discours dans l'avion
+      </button>
+      <button class="bouton noir" id="boutonBilan">
+        Bilan
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <section class="chiffres-cles">
+    <div class="chiffre-cle"><b id="nbVoyages"></b><span class="mono">voyages apostoliques</span></div>
+    <div class="chiffre-cle"><b id="nbPays"></b><span class="mono">pays visités (hors Italie)</span></div>
+    <div class="chiffre-cle rouge"><b id="nbDiscours"></b><span class="mono">discours analysés</span></div>
+    <div class="chiffre-cle"><b id="nbThemes"></b><span class="mono">thèmes identifiés</span></div>
+  </section>
+
+  <nav class="controles">
+    <div class="groupe">
+      <span class="mono">Colorer par</span>
+      <button class="onglet actif" data-mode="discours">Discours</button>
+      <button class="onglet" data-mode="voyages">Voyages</button>
+      <button class="onglet" data-mode="theme">Thème</button>
+      <select id="choixTheme" style="display:none"></select>
+    </div>
+    <div class="groupe">
+      <span class="mono">Voyage</span>
+      <select id="choixVoyage"><option value="">Tous les voyages</option></select>
+    </div>
+    <label class="case-a-cocher"><input type="checkbox" id="voirVoyages" checked> Afficher les trajets</label>
+  </nav>
+
+  <main>
+    <div class="colonne-globe">
+      <div id="zone-globe">{figure}
+        <div class="zoom">
+          <button id="zoomPlus" aria-label="Zoomer">+</button>
+          <button id="zoomMoins" aria-label="Dézoomer">−</button>
+          <button id="recentrer" aria-label="Recentrer sur Rome">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="legendes">
+        <div>
+          <span class="legende-titre mono" id="legendeTitre"></span>
+          <div class="paliers mono" id="legendePaliers"></div>
+          <p class="note" id="legendeNote"></p>
+        </div>
+        <div class="symboles mono">
+          <span><i class="s-rome"></i>Rome</span>
+          <span><i class="s-capitale"></i>Capitale</span>
+          <span><i class="s-ville"></i>Autre ville</span>
+          <span><i class="s-trajet"></i>Trajet</span>
+        </div>
+      </div>
+    </div>
+    <aside id="panneau"></aside>
+  </main>
+
+  <footer class="mono">Glisser pour tourner · molette pour zoomer · cliquer sur un pays, une ville ou un trajet</footer>
+</div>
+
+<script>
+window.addEventListener("load", () => {
+// Données calculées en Python
+const LIEUX = {lieux};       // statistiques de chaque pays
+const VILLES = {villes};     // statistiques de chaque ville
+const VOYAGES = {voyages};   // liste des voyages
+const BILAN = {bilan};       // part des discours dans une capitale
+const REGRESSIONS = {regressions};   // thème -> coefficients (régions, publics) de la régression
+const THEMES = {themes};
+const COULEURS = {couleurs}; // les 6 couleurs de la légende
+const MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet",
+              "août", "septembre", "octobre", "novembre", "décembre"];
+const PAS_UN_PAYS = ["Vatican / Rome", "Avion", "Non déterminé"];
+const FLECHE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12h15M13 6l6 6-6 6"/></svg>';
+const CROIX = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 5l14 14M19 5L5 19"/></svg>';
+
+const globe = document.getElementById("globe");
+Plotly.Plots.resize(globe);   // adapte le globe à la taille de sa zone
+const panneau = document.getElementById("panneau");
+const paysDuGlobe = globe.data[0].customdata.map(c => c[1]);   // noms des pays, dans l'ordre de la carte
+const tracesVoyages = VOYAGES.map((v, i) => i + 1);            // les voyages sont les traces 1, 2, ...
+
+// ------------------------------------------------------------------
+// Chiffres clés
+// ------------------------------------------------------------------
+const nbPays = Object.keys(LIEUX).filter(p => !PAS_UN_PAYS.includes(p) && p !== "Italie").length;
+const nbDiscours = Object.values(LIEUX).reduce((total, l) => total + l.discours, 0);
+document.getElementById("nbVoyages").textContent = VOYAGES.length;
+document.getElementById("nbPays").textContent = nbPays;
+document.getElementById("nbDiscours").textContent = nbDiscours.toLocaleString("fr-FR");
+document.getElementById("nbThemes").textContent = THEMES.length;
+
+// ------------------------------------------------------------------
+// Les trois façons de colorer les pays
+// bornes : seuils des classes ; etiquettes : texte de la légende
+// ------------------------------------------------------------------
+const MODES = {
+  discours: {
+    titre: () => "Discours par pays",
+    bornes: [1, 3, 6, 10, 15],
+    etiquettes: ["0", "1–2", "3–5", "6–9", "10–14", "15+"],
+    survol: x => x + " discours",
+  },
+  voyages: {
+    titre: () => "Voyages apostoliques par pays",
+    bornes: [1, 2, 3, 4, 5],
+    etiquettes: ["0", "1", "2", "3", "4", "5+"],
+    survol: x => x + " voyage(s)",
+  },
+  theme: {
+    titre: () => "Indice « " + choixTheme.value + " » (1 = moyenne du corpus)",
+    bornes: [0.5, 0.8, 1.25, 2, 3],
+    etiquettes: ["< 0,5", "0,5–0,8", "0,8–1,25", "1,25–2", "2–3", "3+"],
+    survol: x => "indice " + choixTheme.value + " : " + x,
+  },
+};
+
+function valeurDuPays(pays, mode) {
+  if (mode === "discours") return LIEUX[pays].discours;
+  if (mode === "voyages") return VOYAGES.filter(v => v.pays.includes(pays)).length;
+  const t = LIEUX[pays].themes.find(t => t.theme === choixTheme.value);
+  return t ? t.indice : 0;
+}
+
+function classe(valeur, bornes) {
+  return bornes.filter(b => valeur >= b).length;   // nombre de seuils atteints
+}
+
+let modeCouleur = "discours";   // façon de colorer les pays actuellement choisie
+
+function signifDuPays(pays) {
+  // résultat du bootstrap pour le thème choisi : "plus", "moins", "ns" ou "peu"
+  const t = LIEUX[pays].themes.find(t => t.theme === choixTheme.value);
+  return t ? t.signif : "peu";
+}
+
+function colorerPays(mode) {
+  const m = MODES[mode];
+  const valeurs = paysDuGlobe.map(p => valeurDuPays(p, mode));
+  modeCouleur = mode;
+  Plotly.restyle(globe, {
+    z: [valeurs.map(x => classe(x, m.bornes))],
+    text: [paysDuGlobe.map((p, i) => p + "<br>" + LIEUX[p].discours + " discours"
+                                     + (mode === "discours" ? "" : "<br>" + m.survol(valeurs[i]))
+                                     + (mode === "theme" ? "<br>" + SENS[signifDuPays(p)] : ""))],
+  }, [0]);
+  document.getElementById("legendeNote").textContent = mode === "theme"
+    ? "Cliquer sur un pays pour savoir si son écart à la moyenne est statistiquement significatif."
+    : "";
+
+  // Onglets, menu des thèmes et légende
+  document.querySelectorAll(".onglet").forEach(o => o.classList.toggle("actif", o.dataset.mode === mode));
+  choixTheme.style.display = mode === "theme" ? "" : "none";
+  document.getElementById("legendeTitre").textContent = m.titre();
+  document.getElementById("legendePaliers").innerHTML = m.etiquettes.map((e, i) =>
+    '<span class="palier"><i style="background:' + COULEURS[i] + '"></i>' + e + "</span>").join("");
+}
+
+// ------------------------------------------------------------------
+// Menus et boutons
+// ------------------------------------------------------------------
+const choixTheme = document.getElementById("choixTheme");
+THEMES.forEach(t => choixTheme.add(new Option(t, t)));
+choixTheme.addEventListener("change", () => { colorerPays("theme"); afficherTheme(choixTheme.value); });
+document.querySelectorAll(".onglet").forEach(o =>
+  o.addEventListener("click", () => {
+    colorerPays(o.dataset.mode);
+    if (o.dataset.mode === "theme") afficherTheme(choixTheme.value);
+  }));
+
+const choixVoyage = document.getElementById("choixVoyage");
+VOYAGES.forEach((v, i) => choixVoyage.add(new Option(v.nom, i)));
+choixVoyage.addEventListener("change", () => {
+  if (choixVoyage.value === "") { surlignerVoyage(null); afficherBilan(); }
+  else { afficherVoyage(Number(choixVoyage.value)); }
+});
+
+document.getElementById("voirVoyages").addEventListener("change", e => {
+  Plotly.restyle(globe, {visible: e.target.checked}, tracesVoyages);
+});
+document.getElementById("boutonAvion").addEventListener("click", () => afficherPays("Avion"));
+document.getElementById("boutonBilan").addEventListener("click", revenirAuBilan);
+document.getElementById("zoomPlus").addEventListener("click", () => zoomer(1.4));
+document.getElementById("zoomMoins").addEventListener("click", () => zoomer(1 / 1.4));
+document.getElementById("recentrer").addEventListener("click", () => {
+  Plotly.relayout(globe, {"geo.projection.rotation.lat": 30, "geo.projection.rotation.lon": 12,
+                          "geo.projection.scale": 1});
+});
+
+// Clic sur le globe : customdata vaut ["pays", nom], ["ville", nom] ou ["voyage", numéro]
+globe.on("plotly_click", evenement => {
+  const [type, valeur] = evenement.points[0].customdata;
+  if (type === "pays") afficherPays(valeur);
+  if (type === "ville") afficherVille(valeur);
+  if (type === "voyage") afficherVoyage(valeur);
+});
+
+// Liens dans la fiche (vers un pays, une ville, un voyage, ou bouton fermer)
+panneau.addEventListener("click", e => {
+  const cible = e.target.closest("[data-pays], [data-ville], [data-voyage], [data-fermer]");
+  if (!cible) return;
+  const lien = cible.dataset;
+  if (lien.pays) afficherPays(lien.pays);
+  else if (lien.ville) afficherVille(lien.ville);
+  else if (lien.voyage !== undefined) afficherVoyage(Number(lien.voyage));
+  else if (lien.fermer) revenirAuBilan();
+});
+
+// ------------------------------------------------------------------
+// Modifier le globe
+// ------------------------------------------------------------------
+function surlignerVoyage(numero) {
+  // numero = null : tous les voyages pareils ; sinon le voyage choisi passe en rouge
+  const couleurs = VOYAGES.map((v, i) => i === numero ? "#C8102E" : "#141414");
+  const largeurs = VOYAGES.map((v, i) => numero === null ? 1 : (i === numero ? 3.5 : 0.8));
+  const opacites = VOYAGES.map((v, i) => numero === null ? 0.45 : (i === numero ? 1 : 0.1));
+  Plotly.restyle(globe, {"line.color": couleurs, "line.width": largeurs, opacity: opacites}, tracesVoyages);
+}
+
+function tournerVers(lat, lon) {
+  Plotly.relayout(globe, {"geo.projection.rotation.lat": lat, "geo.projection.rotation.lon": lon});
+}
+
+function zoomer(facteur) {
+  const echelle = (globe.layout.geo.projection.scale || 1) * facteur;
+  Plotly.relayout(globe, {"geo.projection.scale": Math.min(Math.max(echelle, 0.8), 10)});
+}
+
+function revenirAuBilan() {
+  choixVoyage.value = "";
+  surlignerVoyage(null);
+  afficherBilan();
+}
+
+// ------------------------------------------------------------------
+// Morceaux de fiche
+// ------------------------------------------------------------------
+function dateFr(date) {
+  const [annee, mois, jour] = date.split("-");
+  return Number(jour) + " " + MOIS[Number(mois) - 1] + " " + annee;
+}
+
+function entete(etiquette, nom, sousTitre, nombre, legende, avecFermer) {
+  const taille = nom.length > 24 ? 38 : (nom.length > 12 ? 48 : 68);   // les noms longs en plus petit
+  return '<div class="fiche-haut">'
+    + '<div class="fiche-ligne"><span class="etiquette mono">' + etiquette + "</span>"
+    + (avecFermer ? '<button class="fermer" data-fermer="1" aria-label="Fermer">' + CROIX + "</button>" : "")
+    + "</div>"
+    + '<h2 class="nom" style="font-size:' + taille + 'px">' + nom + "</h2>"
+    + '<p class="sous-titre">' + sousTitre + "</p>"
+    + '<div class="badge"><b>' + nombre + '</b><span class="mono">' + legende + "</span></div>"
+    + "</div>";
+}
+
+function ligneLien(attribut, valeur, etiquette, texte) {
+  return '<div class="ligne-lien" ' + attribut + '="' + valeur + '">'
+    + '<span class="mono">' + etiquette + '</span><span class="texte">' + texte + "</span>" + FLECHE + "</div>";
+}
+
+function section(titre) {
+  return '<h3 class="section">' + titre + "</h3>";
+}
+
+const SENS = {plus: "significativement plus que la moyenne", moins: "significativement moins que la moyenne",
+              ns: "écart non significatif", peu: "trop peu de discours pour conclure"};
+
+function virgule(x) {
+  return String(x).replace(".", ",");
+}
+
+function texteIntervalle(t) {
+  if (t.ic_bas === null || t.ic_bas === undefined) return "moins de 3 discours";
+  return "IC 95 % [" + virgule(t.ic_bas) + " – " + virgule(t.ic_haut) + "]";
+}
+
+function tagsThemes(themes) {
+  // Jaune : écart significatif (bootstrap) ; contour pointillé : non significatif
+  if (themes.length === 0) return '<p class="note">Aucun thème au-dessus de la moyenne.</p>';
+  return '<div class="tags">' + themes.map(t =>
+    '<span class="tag' + (t.signif === "plus" ? "" : " tag-ns") + '" title="' + SENS[t.signif] + " · " + texteIntervalle(t) + '">'
+    + t.theme + "<small>×" + virgule(t.indice) + (t.signif === "plus" ? "" : " n.s.") + "</small></span>").join("") + "</div>"
+    + '<p class="note">Jaune : écart significatif (intervalle de confiance à 95 % au-dessus de 1). '
+    + "Pointillés : non significatif (n.s.).</p>";
+}
+
+function ligneEffet(nom, c) {
+  // Une ligne de résultat de régression : nom, rapport de taux + étoiles, intervalle
+  return '<div class="effet"><span class="effet-nom">' + nom + "</span>"
+    + '<span class="effet-val' + (c.rapport_de_taux > 1 ? " plus" : "") + '">×' + virgule(c.rapport_de_taux.toFixed(2)) + c.signif + "</span>"
+    + '<span class="effet-ic">[' + virgule(c.ic_bas.toFixed(2)) + " – " + virgule(c.ic_haut.toFixed(2)) + "]</span></div>";
+}
+
+const NOTE_REGRESSION = '<p class="note">Rapport de taux d\'une régression binomiale négative : référence = discours au Vatican '
+  + "devant des fidèles, même année. ×2 = deux fois plus de mots du thème par mot prononcé. "
+  + "* p &lt; 0,05 · ** p &lt; 0,01 · *** p &lt; 0,001.</p>";
+
+function effetsRegion(region) {
+  // Les effets significatifs de la région du pays, tous thèmes confondus
+  if (!region) return "";
+  const lignes = [];
+  THEMES.forEach(theme => (REGRESSIONS[theme] || []).forEach(c => {
+    if (c.variable === "région : " + region && c.signif !== "") lignes.push([theme, c]);
+  }));
+  let html = section("Effet propre de la région « " + region + " » (régression)");
+  if (lignes.length === 0) {
+    return html + '<p class="note">Aucun effet significatif, à public et année égaux.</p>';
+  }
+  lignes.sort((a, b) => b[1].rapport_de_taux - a[1].rapport_de_taux);
+  return html + lignes.map(([theme, c]) => ligneEffet(theme, c)).join("") + NOTE_REGRESSION;
+}
+
+function puceVille(v) {
+  return '<span class="puce' + (VILLES[v].capitale ? " capitale" : "") + '" data-ville="' + v + '">'
+    + v + "<small>" + VILLES[v].discours + "</small></span>";
+}
+
+function listeDiscours(liste) {
+  let html = '<ol class="discours">';
+  liste.forEach((d, i) => {
+    const voyage = VOYAGES.find(v => v.debut <= d.date && d.date <= v.fin);
+    html += '<li><span class="num">' + (i + 1) + "</span><div>"
+          + '<a href="' + d.url + '" target="_blank">' + (d.avion ? "✈ " : "") + d.titre + "</a>"
+          + '<div class="meta mono">' + dateFr(d.date) + (voyage ? " · " + voyage.nom : "") + "</div>"
+          + "</div></li>";
+  });
+  return html + "</ol>";
+}
+
+function montrer(html) {
+  panneau.innerHTML = html;
+  panneau.scrollTop = 0;
+}
+
+// ------------------------------------------------------------------
+// Les fiches
+// ------------------------------------------------------------------
+function afficherBilan() {
+  let html = entete("Bilan", "Capitales ou pas ?",
+                    BILAN.discours_etranger + " discours à l'étranger · " + VOYAGES.length + " voyages",
+                    String(BILAN.pct_en_capitale).replace(".", ",") + " %", "des discours<br>dans une capitale", false);
+  html += '<p class="texte-courant">Hors Rome et hors Italie, le pape a prononcé <b>' + BILAN.discours_etranger
+        + "</b> discours à l'étranger (plus " + LIEUX["Avion"].discours + " dans l'avion). "
+        + "<b>" + BILAN.capitales + "</b> des " + BILAN.villes + " villes visitées sont des capitales.</p>";
+  html += '<p class="note">Calculé sur les ' + BILAN.discours_ville_connue
+        + " discours à l'étranger dont la ville a été retrouvée.</p>";
+
+  // Les villes hors capitales, de la plus à la moins visitée
+  const autres = Object.keys(VILLES)
+    .filter(v => !VILLES[v].capitale && VILLES[v].pays !== "Italie")
+    .sort((a, b) => VILLES[b].discours - VILLES[a].discours);
+  html += section("Villes étrangères hors capitales") + '<div class="tags">' + autres.map(puceVille).join("") + "</div>";
+  html += section("Lire les indices")
+        + '<p class="note">Indice d\'un thème = (fréquence du thème dans le pays) / (fréquence dans tout le corpus). '
+        + "Au-dessus de 1, le pape en parle plus que d'habitude.</p>";
+
+  // Robustesse : combien d'écarts (thème, pays) résistent au bootstrap ?
+  const compte = {plus: 0, moins: 0, ns: 0, peu: 0};
+  Object.keys(LIEUX).filter(p => !PAS_UN_PAYS.includes(p))
+    .forEach(p => LIEUX[p].themes.forEach(t => { compte[t.signif] += 1; }));
+  html += section("Les écarts sont-ils solides ?")
+        + '<p class="texte-courant">Pour chaque thème et chaque pays d\'au moins 3 discours, on recalcule l\'indice '
+        + "1 000 fois en tirant les discours au hasard (bootstrap). Seuls <b>" + compte.plus
+        + "</b> écarts sont significativement au-dessus de la moyenne, " + compte.moins + " en dessous, et "
+        + compte.ns + " ne sont pas significatifs.</p>"
+        + '<p class="note">Onglet « Thème » : la fiche du thème donne les pays où l\'écart est significatif '
+        + "et les effets du lieu et du public estimés par régression ; la fiche d'un pays dit si l'écart est solide.</p>";
+  montrer(html);
+}
+
+function afficherPays(pays) {
+  const infos = LIEUX[pays];
+  const nom = pays === "Avion" ? "Dans l'avion" : pays;
+  let html = entete(pays === "Avion" ? "Conférences de presse" : "Fiche pays", nom,
+                    infos.nb_mots.toLocaleString("fr-FR") + " mots · " + infos.annees.join(", "),
+                    infos.discours, "discours", true);
+
+  // Les voyages passés par ce pays
+  VOYAGES.forEach((v, i) => {
+    if (v.pays.includes(pays)) html += ligneLien("data-voyage", i, "Voyage", v.nom);
+  });
+
+  const villesDuPays = Object.keys(VILLES).filter(v => VILLES[v].pays === pays);
+  if (villesDuPays.length > 0) {
+    html += section("Villes") + '<div class="tags">' + villesDuPays.map(puceVille).join("") + "</div>";
+  }
+
+  // En mode Thème : le thème choisi ; sinon : le thème le plus marqué du pays
+  html += verdict(nom, modeCouleur === "theme"
+                       ? infos.themes.find(t => t.theme === choixTheme.value) : infos.themes[0]);
+  html += section("Thèmes évoqués") + tagsThemes(infos.themes.filter(t => t.indice >= 1).slice(0, 5));
+  html += effetsRegion(infos.region);
+  if (infos.discours < 3) {
+    html += '<p class="note">Attention : moins de 3 discours, les indices sont peu fiables.</p>';
+  }
+
+  html += section("Indice par thème") + "<table>";
+  infos.themes.forEach(t => {
+    const largeur = Math.min(t.indice, 3) / 3 * 100;   // barre plafonnée à un indice de 3
+    // rouge : significativement plus ; noir : significativement moins ; gris : non significatif
+    const classe = t.signif === "plus" ? " plus" : (t.signif === "moins" ? "" : " ns");
+    const intervalle = t.ic_bas === null ? "–" : "[" + virgule(t.ic_bas) + " – " + virgule(t.ic_haut) + "]";
+    html += "<tr><td>" + t.theme + '</td><td class="chiffre"><b>' + virgule(t.indice) + "</b></td>"
+          + '<td class="chiffre effet-ic">' + intervalle + "</td>"
+          + '<td><div class="barre-fond"><div class="barre-val' + classe
+          + '" style="width:' + largeur + '%"></div></div></td></tr>';
+  });
+  html += '</table><p class="note">Colonnes : indice · intervalle de confiance à 95 % (bootstrap) · barre plafonnée à 3. '
+        + "Rouge : significativement au-dessus de 1 ; noir : en dessous ; gris : non significatif.</p>";
+
+  html += section("Discours") + listeDiscours(infos.liste);
+  montrer(html);
+}
+
+function verdict(lieu, t) {
+  // Explication en français : l'écart du thème dans ce lieu est-il significatif ?
+  if (!t) return "";
+  const indice = virgule(t.indice);
+  let titre, texte;
+  if (t.signif === "plus" || t.signif === "moins") {
+    titre = "Écart significatif";
+    texte = "Ici (" + lieu + "), le pape emploie les mots du thème « " + t.theme + " » "
+      + (t.signif === "plus" ? indice + " fois plus souvent"
+                             : "seulement " + indice + " fois autant (donc moins)")
+      + " que dans l'ensemble de ses discours. L'intervalle de confiance à 95 % va de " + virgule(t.ic_bas) + " à " + virgule(t.ic_haut)
+      + " : il est entièrement " + (t.signif === "plus" ? "au-dessus" : "en dessous")
+      + " de 1. Même en tirant au hasard d'autres combinaisons de ses discours, l'écart persiste : "
+      + "il ne tient pas à un seul discours.";
+  } else if (t.signif === "ns") {
+    titre = "Écart non significatif";
+    texte = "L'indice vaut " + indice + ", mais l'intervalle de confiance à 95 % va de " + virgule(t.ic_bas)
+      + " à " + virgule(t.ic_haut) + " et contient 1. Selon les discours tirés au hasard, l'indice peut "
+      + "passer au-dessus comme en dessous de la moyenne : on ne peut pas conclure que le pape parle "
+      + (t.indice >= 1 ? "plus" : "moins") + " de ce thème ici qu'ailleurs.";
+  } else {
+    titre = "Trop peu de discours pour conclure";
+    texte = "L'indice vaut " + indice + ", mais il repose sur moins de 3 discours : un seul discours "
+      + "suffit à le faire monter ou descendre. Aucun intervalle de confiance n'est calculé.";
+  }
+  const couleur = t.signif === "plus" ? "var(--rouge)" : (t.signif === "moins" ? "var(--encre)" : "var(--gris)");
+  return section("« " + t.theme + " » ici : est-ce significatif ?")
+    + '<div class="verdict" style="border-color:' + couleur + '">'
+    + '<b style="color:' + couleur + '">' + titre + "</b><p>" + texte + "</p></div>";
+}
+
+function afficherTheme(theme) {
+  const ligne = p => LIEUX[p].themes.find(t => t.theme === theme);
+  const pays = Object.keys(LIEUX).filter(p => !PAS_UN_PAYS.includes(p) && ligne(p));
+  const plus = pays.filter(p => ligne(p).signif === "plus").sort((a, b) => ligne(b).indice - ligne(a).indice);
+  const moins = pays.filter(p => ligne(p).signif === "moins").sort((a, b) => ligne(a).indice - ligne(b).indice);
+  const coefficients = REGRESSIONS[theme] || [];
+  const effets = debut => coefficients.filter(c => c.variable.startsWith(debut) && c.signif !== "");
+
+  let html = entete("Fiche thème", theme, "Intervalles de confiance (bootstrap) et régression",
+                    plus.length, "pays significativement<br>au-dessus de la moyenne", true);
+
+  html += section("Pays où il en parle significativement plus");
+  html += plus.length === 0 ? '<p class="note">Aucun pays : tous les intervalles contiennent 1.</p>'
+        : plus.map(p => ligneLien("data-pays", p, "×" + virgule(ligne(p).indice),
+                                  p + ' <span class="effet-ic">' + texteIntervalle(ligne(p)) + "</span>")).join("");
+  if (moins.length > 0) {
+    html += section("Significativement moins") + '<div class="tags">' + moins.map(p =>
+      '<span class="puce" data-pays="' + p + '">' + p + "<small>×" + virgule(ligne(p).indice) + "</small></span>").join("") + "</div>";
+  }
+
+  const regions = effets("région : ");
+  html += section("Effet propre du lieu (régression)");
+  html += regions.length === 0 ? '<p class="note">Aucune région ne se distingue du Vatican, à public et année égaux.</p>'
+        : regions.map(c => ligneEffet(c.variable.replace("région : ", ""), c)).join("");
+  const publics = effets("public : ");
+  html += section("Effet du public (régression)");
+  html += publics.length === 0 ? '<p class="note">Aucun public ne se distingue des fidèles.</p>'
+        : publics.map(c => ligneEffet(c.variable.replace("public : ", ""), c)).join("");
+  html += NOTE_REGRESSION;
+  html += '<p class="note">Cliquer sur un pays de la carte pour savoir si son écart est significatif.</p>';
+  montrer(html);
+}
+
+function afficherVille(ville) {
+  const infos = VILLES[ville];
+  let html = entete("Fiche ville", ville,
+                    '<span class="lien" data-pays="' + infos.pays + '">' + infos.pays + "</span> · "
+                    + (infos.capitale ? "capitale" : "pas une capitale"),
+                    infos.discours, "discours", true);
+
+  // Les voyages qui sont passés par cette ville
+  VOYAGES.forEach((v, i) => {
+    if (v.etapes.includes(ville)) html += ligneLien("data-voyage", i, "Voyage", v.nom);
+  });
+
+  html += verdict(ville, modeCouleur === "theme"
+                         ? infos.themes.find(t => t.theme === choixTheme.value) : infos.themes[0]);
+  html += section("Thèmes évoqués") + tagsThemes(infos.themes);
+  html += section("Discours") + listeDiscours(infos.liste);
+  montrer(html);
+}
+
+function afficherVoyage(numero) {
+  const v = VOYAGES[numero];
+  choixVoyage.value = numero;
+  surlignerVoyage(numero);
+  tournerVers(VILLES[v.etapes[0]].lat, VILLES[v.etapes[0]].lon);
+
+  let html = entete("Fiche voyage", v.pays.join(", "),
+                    "Du " + dateFr(v.debut) + " au " + dateFr(v.fin),
+                    v.liste.length, "discours", true);
+  html += '<div class="petits-chiffres mono"><span><b>' + v.etapes.length + "</b>ville(s)</span>"
+        + "<span><b>" + v.conferences_avion + "</b>dans l'avion</span></div>";
+  v.pays.forEach(p => { html += ligneLien("data-pays", p, "Pays", p); });
+  html += section("Étapes") + '<div class="tags"><span class="puce capitale">Rome</span>'
+        + v.etapes.map(puceVille).join("") + '<span class="puce capitale">Rome</span></div>';
+  html += section("Discours (✈ = dans l'avion)") + listeDiscours(v.liste);
+  montrer(html);
+}
+
+colorerPays("discours");
+afficherBilan();
+});
+</script>
+</body>
+</html>
