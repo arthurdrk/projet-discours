@@ -272,9 +272,9 @@ def cite_le_pays_hote(df):
     return pd.Series([iso in pays_mentionnes(texte) for iso, texte in zip(df["iso"], df["text"])], index=df.index)
 
 
-def taux_lexique(df, groupe):
+def taux_lexique(df, groupe, lexique=LEXIQUE):
     """Mentions de chaque thème pour 10 000 mots, par groupe (une ligne par groupe)."""
-    mentions = pd.DataFrame({theme: df["text"].str.count(motif, flags=re.I) for theme, motif in LEXIQUE.items()})
+    mentions = pd.DataFrame({theme: df["text"].str.count(motif, flags=re.I) for theme, motif in lexique.items()})
     mentions[groupe] = df[groupe]
     return mentions.groupby(groupe).sum().div(df.groupby(groupe)["n_mots"].sum(), axis=0) * 10_000
 

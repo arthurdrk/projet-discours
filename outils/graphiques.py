@@ -50,13 +50,13 @@ def titre(fig, texte, sous_titre=None, hauteur=450, marge_haute=0):
     return fig
 
 
-def carte_chaleur(valeurs, texte, sous_titre=None):
+def carte_chaleur(valeurs, texte, sous_titre=None, unite="mentions pour 10 000 mots"):
     """Tableau coloré ligne par ligne : case la plus foncée au maximum de la ligne, la plus claire au minimum."""
     relatif = valeurs.sub(valeurs.min(axis=1), axis=0).div(valeurs.max(axis=1) - valeurs.min(axis=1), axis=0)
     fig = go.Figure(go.Heatmap(
         z=relatif, x=list(valeurs.columns), y=list(valeurs.index), customdata=valeurs,
         text=valeurs.round(0).astype(int), texttemplate="%{text}", colorscale=ECHELLE_BLEUE, showscale=False,
-        xgap=2, ygap=2, hovertemplate="%{y}, %{x}<br>%{customdata:.1f} mentions pour 10 000 mots<extra></extra>"))
+        xgap=2, ygap=2, hovertemplate="%{y}, %{x}<br>%{customdata:.1f} " + unite + "<extra></extra>"))
     fig.update_xaxes(side="top", showline=False)
     fig.update_yaxes(autorange="reversed")
     lignes = max(str(colonne).count("<br>") + 1 for colonne in valeurs.columns)
