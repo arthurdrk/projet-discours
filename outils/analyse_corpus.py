@@ -3,7 +3,8 @@ import re
 
 import numpy as np
 import pandas as pd
-from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, CountVectorizer
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, CountVectorizer, TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 from stockage import lire
 
@@ -302,3 +303,21 @@ def mots_caracteristiques(df, groupe, n=8, minimum=10):
         meilleurs = np.argsort(z)[::-1][:n]
         resultats[valeur] = pd.Series(z[meilleurs], index=vocabulaire[meilleurs])
     return resultats
+
+
+def similarite_des_paires(df):
+    """Similarité cosinus (TF-IDF) entre toutes les paires de discours, avec le pays et le public de chacun.
+
+    On ne garde que les mots écrits en minuscules dans le texte : les noms de lieux, de personnes et
+    les gentilés (« Kenyan ») disparaissent. Deux discours du même pays ne se ressemblent donc pas
+    seulement parce qu'ils nomment les mêmes lieux.
+    """
+    def mots_communs(texte):
+        return [m for m in MOT.findall(texte.replace("’", "'")) if m.islower() and len(m) > 2 and m not in MOTS_VIDES]
+
+    poids = TfidfVectorizer(analyzer=mots_communs, min_df=3).fit_transform(df["text"])
+    similarite = cosine_similarity(poids)
+    i, j = np.triu_indices(len(df), k=1)
+    pays, public = df["iso"].to_numpy(), df["public"].to_numpy()
+    return pd.DataFrame({"i": i, "j": j, "similarite": similarite[i, j],
+                         "meme_pays": pays[i] == pays[j], "meme_public": public[i] == public[j]})
