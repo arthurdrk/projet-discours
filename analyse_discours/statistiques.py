@@ -21,15 +21,13 @@ import pandas as pd
 
 from compter_mots import decouper_en_mots
 from pays import pays_du_discours
-from villes import ville_du_discours
 
 
 def preparer_discours(discours):
-    """Ajoute à chaque discours son pays, sa ville, le compte de ses mots et sa longueur."""
+    """Ajoute à chaque discours son pays, le compte de ses mots et sa longueur."""
     for d in discours:
         mots = decouper_en_mots(d["texte"])
         d["pays"] = pays_du_discours(d)
-        d["ville"] = ville_du_discours(d)   # None si inconnue (ou dans l'avion)
         d["compte_mots"] = Counter(mots)
         d["nb_mots"] = len(mots)
     return discours
