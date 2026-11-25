@@ -3,7 +3,7 @@ body {
   color: #0b0b0b;
 }
 
-/* Les encadrés « À rédiger » ressortent en jaune tant qu'ils ne sont pas remplacés. */
+/* Les encadrés « To write » et « À rédiger » ressortent en jaune tant qu'ils ne sont pas remplacés. */
 blockquote {
   border-left: 4px solid #eda100;
   background: #fff8e6;
