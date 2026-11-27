@@ -69,7 +69,6 @@ def df_preparation(popes=POPES):
     return df
 
 
-
 if __name__ == "__main__":
     df_trips = df_preparation()
 
