@@ -3,30 +3,33 @@ project:
   output-dir: _site
   render:
     - index.qmd
+    - notebooks/report.ipynb
     - notebooks/rapport.ipynb
 
 website:
-  title: "Les discours du pape François en voyage"
+  title: "Pope Francis abroad"
   site-url: https://arthurdrk.github.io/projet-discours/
   navbar:
     left:
       - href: index.qmd
-        text: Accueil
+        text: Home
+      - href: notebooks/report.ipynb
+        text: Report
       - href: notebooks/rapport.ipynb
-        text: Rapport
+        text: Rapport (FR)
     right:
       - icon: github
         href: https://github.com/arthurdrk/projet-discours
-        aria-label: Code sur GitHub
+        aria-label: Code on GitHub
   page-footer:
-    center: "Projet ENSAE 2026, données vatican.va"
+    center: "ENSAE project, 2026. Data: vatican.va, RCS-Dem 2.0, World Bank"
 
 format:
   html:
     theme: cosmo
     css: site.css
-    lang: fr
+    lang: en
     toc: true
-    toc-title: Sommaire
+    toc-title: Contents
     code-fold: true
-    code-summary: Voir le code
+    code-summary: Show the code

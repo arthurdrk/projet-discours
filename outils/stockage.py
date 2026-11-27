@@ -11,6 +11,8 @@ un service du SSPCloud). Sans eux, les fichiers restent seulement dans data/.
 Envoyer sur le S3 les fichiers déjà présents dans data/ : python outils/stockage.py
 """
 from pathlib import Path
+from urllib.parse import quote
+from urllib.request import urlretrieve
 
 import pandas as pd
 
@@ -21,7 +23,7 @@ DOSSIER_LOCAL = Path(__file__).resolve().parents[1] / "data"
 
 def adresse_publique(nom):
     """Adresse web publique d'un fichier du projet sur le S3."""
-    return f"{ENDPOINT}/{DOSSIER_S3}/{nom}"
+    return f"{ENDPOINT}/{DOSSIER_S3}/{quote(nom)}"
 
 
 def envoyer_sur_s3(nom):
@@ -57,6 +59,23 @@ def lire(nom):
             f"{nom} est absent de data/ et du S3 ({adresse_publique(nom)}). "
             "Lancer python acquisition/telecharger_discours.py puis python acquisition/preparer_corpus.py."
         ) from erreur
+
+
+
+def fichier(nom):
+    """Chemin de data/<nom>. S'il manque, la version publique du S3 est d'abord copiée dans data/.
+
+    Sert pour les fichiers qui ne sont pas en parquet (csv de la Banque mondiale, fichier SPSS).
+    """
+    chemin = DOSSIER_LOCAL / nom
+    if not chemin.exists():
+        DOSSIER_LOCAL.mkdir(exist_ok=True)
+        try:
+            urlretrieve(adresse_publique(nom), chemin)
+        except Exception as erreur:
+            chemin.unlink(missing_ok=True)
+            raise FileNotFoundError(f"{nom} est absent de data/ et du S3 ({adresse_publique(nom)}).") from erreur
+    return chemin
 
 
 if __name__ == "__main__":

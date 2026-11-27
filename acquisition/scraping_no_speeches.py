@@ -69,14 +69,16 @@ def df_preparation(popes=POPES):
     return df
 
 
-df_trips = df_preparation()
 
-print("done")
+if __name__ == "__main__":
+    df_trips = df_preparation()
 
-FILE_PATH_OUT_S3_Parquet = f"{MY_BUCKET}/diffusion/df_trips.parquet"
-FILE_PATH_OUT_S3_normal = f"{MY_BUCKET}/diffusion/df_trips.csv"
+    print("done")
 
-with fs.open(FILE_PATH_OUT_S3_Parquet, 'wb') as file_out:
-    df_trips.to_parquet(file_out)
-with fs.open(FILE_PATH_OUT_S3_normal, 'w') as file_out:
-    df_trips.to_csv(file_out)
+    FILE_PATH_OUT_S3_Parquet = f"{MY_BUCKET}/diffusion/df_trips.parquet"
+    FILE_PATH_OUT_S3_normal = f"{MY_BUCKET}/diffusion/df_trips.csv"
+
+    with fs.open(FILE_PATH_OUT_S3_Parquet, 'wb') as file_out:
+        df_trips.to_parquet(file_out)
+    with fs.open(FILE_PATH_OUT_S3_normal, 'w') as file_out:
+        df_trips.to_csv(file_out)

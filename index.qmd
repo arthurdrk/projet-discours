@@ -1,17 +1,19 @@
 ---
-title: "Les discours du pape François en voyage"
-subtitle: "Projet de Python pour la data science, ENSAE, 2026"
+title: "Pope Francis abroad: where he goes and what he says"
+subtitle: "Python for data science project, ENSAE, 2026"
 toc: false
 ---
 
-Entre 2013 et 2024, le pape François a fait 47 voyages hors d'Italie et y a prononcé 342 discours. Ce projet cherche à savoir s'il adapte ce qu'il dit au pays et au public qu'il rencontre.
+Between 2013 and 2024, Pope Francis made 47 trips outside Italy and gave 342 speeches there. This project asks where the pope goes, compared with his two predecessors, and whether he adapts what he says to the country and to the audience he meets.
 
-[Lire le rapport](notebooks/rapport.ipynb){.btn .btn-primary}
+[Read the report](notebooks/report.ipynb){.btn .btn-primary}
 
-## Le projet en bref
+## The project in brief
 
-- Les données : les discours en anglais publiés sur vatican.va, collectés automatiquement puis nettoyés.
-- La méthode : statistiques descriptives, comptage de thèmes à partir de listes de mots, mots caractéristiques de chaque continent.
-- Le code est sur [GitHub](https://github.com/arthurdrk/projet-discours). Les données préparées sont en accès libre sur le stockage du SSP Cloud.
+- The data: the trips of the last three popes and the English speeches of Francis, collected from vatican.va, crossed with the religious composition of the countries (RCS-Dem 2.0) and their GDP per capita (World Bank).
+- The method: descriptive statistics, counts of themes from lists of words, specific words of each continent, then a bootstrap and a negative binomial regression to check which differences are robust.
+- The code is on [GitHub](https://github.com/arthurdrk/projet-discours). The prepared data is openly available on the SSP Cloud storage.
 
-Auteurs : Quentin Brisemur, Arthur De Rouck, Adrien Vibert.
+A first version of the analysis of the speeches, in French, is also [available](notebooks/rapport.ipynb).
+
+Authors: Quentin Brisemur, Arthur De Rouck, Adrien Vibert.
