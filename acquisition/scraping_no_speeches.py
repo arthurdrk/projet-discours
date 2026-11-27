@@ -81,3 +81,4 @@ if __name__ == "__main__":
         df_trips.to_parquet(file_out)
     with fs.open(FILE_PATH_OUT_S3_normal, 'w') as file_out:
         df_trips.to_csv(file_out)
+
