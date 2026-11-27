@@ -21,9 +21,9 @@ DOSSIER_S3 = "arthurdk/diffusion/projet-discours"
 DOSSIER_LOCAL = Path(__file__).resolve().parents[1] / "data"
 
 
-def adresse_publique(nom):
+def adresse_publique(nom, dossier=DOSSIER_S3):
     """Adresse web publique d'un fichier du projet sur le S3."""
-    return f"{ENDPOINT}/{DOSSIER_S3}/{quote(nom)}"
+    return f"{ENDPOINT}/{dossier}/{quote(nom)}"
 
 
 def envoyer_sur_s3(nom):
@@ -62,19 +62,20 @@ def lire(nom):
 
 
 
-def fichier(nom):
+def fichier(nom, dossier=DOSSIER_S3):
     """Chemin de data/<nom>. S'il manque, la version publique du S3 est d'abord copiée dans data/.
 
-    Sert pour les fichiers qui ne sont pas en parquet (csv de la Banque mondiale, fichier SPSS).
+    `dossier` est le dossier public du S3 où se trouve le fichier. Les fichiers d'Adrien (voyages des
+    papes, religions, PIB) sont dans le sien : avibert/diffusion.
     """
     chemin = DOSSIER_LOCAL / nom
     if not chemin.exists():
         DOSSIER_LOCAL.mkdir(exist_ok=True)
         try:
-            urlretrieve(adresse_publique(nom), chemin)
+            urlretrieve(adresse_publique(nom, dossier), chemin)
         except Exception as erreur:
             chemin.unlink(missing_ok=True)
-            raise FileNotFoundError(f"{nom} est absent de data/ et du S3 ({adresse_publique(nom)}).") from erreur
+            raise FileNotFoundError(f"{nom} est absent de data/ et du S3 ({adresse_publique(nom, dossier)}).") from erreur
     return chemin
 
 
