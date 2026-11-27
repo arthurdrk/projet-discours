@@ -40,7 +40,4 @@ Les fichiers sont écrits dans `data/`, puis copiés sur le SSP Cloud si les ide
 | `index.qmd`, `_quarto.yml`, `site.css` | Le site web du rapport |
 | `acquisition/` | Collecte et préparation des discours (`telecharger_discours.py`, `preparer_corpus.py`) et des voyages des trois derniers papes (`scraping_no_speeches.py`, `cleaning_no_speeches.py`) |
 | `outils/` | Fonctions communes : lecture et écriture des données, analyse des discours, robustesse (bootstrap et régression), noms anglais des catégories, graphiques |
-| `tests/` | Tests de la collecte, de la préparation et du bootstrap, sans accès au réseau |
 | `docs/` | Notes de travail |
-
-Pour lancer les tests : `python -m unittest discover -s tests`
