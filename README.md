@@ -28,9 +28,16 @@ python acquisition/preparer_corpus.py        # quelques secondes, produit data/d
 
 Le premier script lit les dates de chaque voyage hors d'Italie, puis garde dans les index mensuels les discours prononcés à ces dates (415 textes). Le second sépare l'en-tête du discours, lit le lieu et retire les conférences de presse dans l'avion ainsi que deux discours prononcés au Vatican le matin d'un départ (342 discours).
 
-La table des voyages des trois papes vient aussi de vatican.va : `acquisition/scraping_no_speeches.py` lit la liste des voyages, puis `acquisition/cleaning_no_speeches.py` en tire les pays visités et leur code ISO3. Ces deux scripts écrivent dans le bucket d'Adrien. Les fichiers RCS-Dem 2.0 et Banque mondiale se téléchargent à la main sur le site de leur producteur.
-
 Les fichiers sont écrits dans `data/`, puis copiés sur le SSP Cloud si les identifiants S3 sont définis. Dans un service du SSP Cloud, ils le sont déjà. Sur un autre ordinateur, il faut définir `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` et `AWS_SESSION_TOKEN`, que l'on trouve dans Mon compte, rubrique Connexion au stockage.
+
+La table des voyages des trois papes vient aussi de vatican.va :
+
+```bash
+python acquisition/scraping_no_speeches.py   # liste des voyages, produit df_trips.parquet
+python acquisition/cleaning_no_speeches.py   # pays visités et code ISO3, produit df_trips_countries.parquet
+```
+
+Ces deux scripts lisent et écrivent dans le dossier `avibert/diffusion` du SSP Cloud, avec les identifiants S3 d'Adrien. Les fichiers RCS-Dem 2.0 (religions) et Banque mondiale (PIB par habitant, https://data.worldbank.org/indicator/NY.GDP.PCAP.KD) se téléchargent à la main sur le site de leur producteur. Le notebook corrige deux points de la table des voyages : il ajoute le Luxembourg et la Belgique au voyage de Jean-Paul II de 1985, et retire le voyage de François à Dubaï pour la COP28, annulé.
 
 ## Organisation du dépôt
 
@@ -38,6 +45,6 @@ Les fichiers sont écrits dans `data/`, puis copiés sur le SSP Cloud si les ide
 | --- | --- |
 | `main.ipynb` | Le rapport |
 | `index.qmd`, `_quarto.yml`, `site.css` | Le site web du rapport |
-| `acquisition/` | Collecte et préparation des discours (`telecharger_discours.py`, `preparer_corpus.py`) et des voyages des trois derniers papes (`scraping_no_speeches.py`, `cleaning_no_speeches.py`) |
+| `acquisition/` | Collecte et préparation des discours (`telecharger_discours.py`, `preparer_corpus.py`) et des voyages des trois derniers papes (`scraping_no_speeches.py`, `cleaning_no_speeches.py`). `archives_cleaning_spacy.py` est une ancienne version du nettoyage des voyages, gardée pour mémoire et non utilisée. |
 | `outils/` | Fonctions communes : lecture et écriture des données, analyse des discours, robustesse (bootstrap et régression), noms anglais des catégories, graphiques |
 | `docs/` | Notes de travail |

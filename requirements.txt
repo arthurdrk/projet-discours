@@ -2,7 +2,6 @@ requests>=2.32,<3
 beautifulsoup4>=4.12,<5
 pandas>=2.2,<3
 numpy>=1.26,<3
-matplotlib>=3.8,<4
 scikit-learn>=1.5,<2
 jupyterlab>=4,<5
 ipykernel>=6,<8
@@ -12,7 +11,6 @@ scipy>=1.11
 # Collecte : fichiers parquet et stockage S3 du SSPCloud
 pyarrow>=15
 s3fs>=2024.2
-# Voyages des papes, religions et PIB (acquisition/ et main.ipynb)
+# Voyages des papes (acquisition/), noms des pays et fichier SPSS des religions (main.ipynb)
 geonamescache>=3.0,<4
 pyreadstat
-geopandas>=0.14
