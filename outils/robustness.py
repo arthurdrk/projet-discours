@@ -1,6 +1,6 @@
 """Are the differences between groups of speeches robust?
 
-Adapted from Quentin's work (analyse_discours/robustesse.py) to the corpus of 342 speeches.
+Adapted from Quentin's first analysis to the corpus of 342 speeches.
 
 1. Bootstrap. The index of a theme in a group (a continent, a country) is its rate of mentions
    in the group divided by its rate in the whole corpus. We draw the speeches of the group again

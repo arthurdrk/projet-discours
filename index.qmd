@@ -6,14 +6,12 @@ toc: false
 
 Between 2013 and 2024, Pope Francis made 47 trips outside Italy and gave 342 speeches there. This project asks where the pope goes, compared with his two predecessors, and whether he adapts what he says to the country and to the audience he meets.
 
-[Read the report](notebooks/report.ipynb){.btn .btn-primary}
+[Read the report](main.ipynb){.btn .btn-primary}
 
 ## The project in brief
 
 - The data: the trips of the last three popes and the English speeches of Francis, collected from vatican.va, crossed with the religious composition of the countries (RCS-Dem 2.0) and their GDP per capita (World Bank).
-- The method: descriptive statistics, counts of themes from lists of words, specific words of each continent, then a bootstrap and a negative binomial regression to check which differences are robust.
+- The method: descriptive statistics, counts of themes from lists of words by country, continent and audience, specific words of each continent, similarity between speeches, then a bootstrap and a negative binomial regression to check which differences are robust.
 - The code is on [GitHub](https://github.com/arthurdrk/projet-discours). The prepared data is openly available on the SSP Cloud storage.
-
-A first version of the analysis of the speeches, in French, is also [available](notebooks/rapport.ipynb).
 
 Authors: Quentin Brisemur, Arthur De Rouck, Adrien Vibert.

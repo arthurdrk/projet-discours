@@ -3,8 +3,7 @@ project:
   output-dir: _site
   render:
     - index.qmd
-    - notebooks/report.ipynb
-    - notebooks/rapport.ipynb
+    - main.ipynb
 
 website:
   title: "Pope Francis abroad"
@@ -13,10 +12,8 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - href: notebooks/report.ipynb
+      - href: main.ipynb
         text: Report
-      - href: notebooks/rapport.ipynb
-        text: Rapport (FR)
     right:
       - icon: github
         href: https://github.com/arthurdrk/projet-discours

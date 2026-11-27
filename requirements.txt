@@ -12,7 +12,7 @@ scipy>=1.11
 # Collecte : fichiers parquet et stockage S3 du SSPCloud
 pyarrow>=15
 s3fs>=2024.2
-# Voyages des papes, religions et PIB (acquisition/ et Report.ipynb)
+# Voyages des papes, religions et PIB (acquisition/ et main.ipynb)
 geonamescache>=3.0,<4
 pyreadstat
 geopandas>=0.14
