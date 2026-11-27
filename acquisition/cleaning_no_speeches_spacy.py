@@ -67,19 +67,20 @@ def city_to_country(locality_name):
     best = max(results, key=lambda c: c["population"])
     return countries[best["countrycode"]]["name"]
 
+if __name__ == "__main__":
 
-MY_BUCKET = "avibert"
-FILE_PATH_OUT_S3_Parquet = f"{MY_BUCKET}/diffusion/df_trips.parquet"
+    MY_BUCKET = "avibert"
+    FILE_PATH_OUT_S3_Parquet = f"{MY_BUCKET}/diffusion/df_trips.parquet"
 
-with fs.open(FILE_PATH_OUT_S3_Parquet, 'rb') as file_in:
-    df = pd.read_parquet(file_in)
+    with fs.open(FILE_PATH_OUT_S3_Parquet, 'rb') as file_in:
+        df = pd.read_parquet(file_in)
 
-get_nlp()
-df["Place_extracted"] = df["Place"].apply(place_extract)
-df = df.explode("Place_extracted")
-df = df.dropna()
-df["Place_extracted"] = df["Place_extracted"].apply(city_to_country)
-df["Place_extracted"] = df["Place_extracted"].replace(["European Parliament", "Holy Land", "Veneto", "Federal Replublic of Germany"],
-                                                      ["France", "Israel", "Italy", "Germany"])
-df = df.loc[df["Place_extracted"] != "Italy", :]
-print(df.loc[~df["Place_extracted"].isin(countries_name), :])
+    get_nlp()
+    df["Place_extracted"] = df["Place"].apply(place_extract)
+    df = df.explode("Place_extracted")
+    df = df.dropna()
+    df["Place_extracted"] = df["Place_extracted"].apply(city_to_country)
+    df["Place_extracted"] = df["Place_extracted"].replace(["European Parliament", "Holy Land", "Veneto", "Federal Replublic of Germany"],
+                                                        ["France", "Israel", "Italy", "Germany"])
+    df = df.loc[df["Place_extracted"] != "Italy", :]
+    print(df.loc[~df["Place_extracted"].isin(countries_name), :])
